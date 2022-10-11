@@ -1,0 +1,45 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.title {
+    color: var(--select-color-scheme-title-color);
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.color_schemes {
+    display: flex;
+    flex-direction: row;
+    height: 60px;
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+}
+
+.color_scheme {
+    --select-color-scheme-color-scheme-color: var(--color-scheme-background, #ffffff);
+    --select-color-scheme-color-scheme-selected-color: var(--color-scheme-foreground, #000000);
+    all: initial;
+    background-color: var(--select-color-scheme-color-scheme-color);
+    border-radius: 40px;
+    border: 3px solid #888888;
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 40px;
+    margin: 5px;
+    width: 40px;
+}
+
+.color_scheme:not([data-selected]) {
+    cursor: pointer;
+}
+
+.color_scheme[data-system] {
+    border-style: dashed;
+}
+
+.color_scheme[data-selected] {
+    border-color: var(--select-color-scheme-color-scheme-selected-color);
+}

@@ -1,0 +1,14 @@
+{
+    "name": "flux-color-scheme-api",
+    "productName": "flux-color-scheme-api",
+    "version": "2022-10-11-1",
+    "description": "",
+    "keywords": [],
+    "homepage": "",
+    "peerDependencies": {
+        "flux-css-api": "*",
+        "flux-localization-api": "*",
+        "flux-settings-api": "*"
+    },
+    "private": true
+}
