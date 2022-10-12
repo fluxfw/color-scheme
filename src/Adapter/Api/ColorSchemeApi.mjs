@@ -99,7 +99,7 @@ export class ColorSchemeApi {
             this.#system_color_scheme_detector ??= this.#getSystemColorSchemeDetector();
 
             this.#system_color_scheme_detector.addEventListener("change", () => {
-                this.#renderColorScheme(
+                this.renderColorScheme(
                     true
                 );
             });
@@ -119,7 +119,7 @@ export class ColorSchemeApi {
             `${__dirname}/../ColorScheme/SelectColorSchemeVariables.css`
         );
 
-        this.#renderColorScheme();
+        this.renderColorScheme();
     }
 
     /**
@@ -159,6 +159,16 @@ export class ColorSchemeApi {
     }
 
     /**
+     * @param {boolean} only_if_system_color_scheme
+     * @returns {void}
+     */
+    renderColorScheme(only_if_system_color_scheme = false) {
+        this.#color_scheme_service.renderColorScheme(
+            only_if_system_color_scheme
+        );
+    }
+
+    /**
      * @returns {ColorSchemeService}
      */
     #getColorSchemeService() {
@@ -179,15 +189,5 @@ export class ColorSchemeApi {
      */
     #getSystemColorSchemeDetector() {
         return this.#color_scheme_service.getSystemColorSchemeDetector();
-    }
-
-    /**
-     * @param {boolean} only_if_system_color_scheme
-     * @returns {void}
-     */
-    #renderColorScheme(only_if_system_color_scheme = false) {
-        this.#color_scheme_service.renderColorScheme(
-            only_if_system_color_scheme
-        );
     }
 }
