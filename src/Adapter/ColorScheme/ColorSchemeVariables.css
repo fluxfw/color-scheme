@@ -1,4 +1,4 @@
 :root {
-    background-color: var(--color-scheme-background);
-    color: var(--color-scheme-foreground);
+    background-color: var(--color-scheme-background, #ffffff);
+    color: var(--color-scheme-foreground, #000000);
 }
