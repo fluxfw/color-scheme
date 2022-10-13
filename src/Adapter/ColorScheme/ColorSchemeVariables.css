@@ -1,4 +1,5 @@
 :root {
+    accent-color: var(--color-scheme-accent, #000000);
     background-color: var(--color-scheme-background, #ffffff);
     color: var(--color-scheme-foreground, #000000);
 }

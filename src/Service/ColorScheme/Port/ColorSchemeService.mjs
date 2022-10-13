@@ -1,4 +1,7 @@
+import { GetAccentCommand } from "../Command/GetAccentCommand.mjs";
+import { GetBackgroundCommand } from "../Command/GetBackgroundCommand.mjs";
 import { GetColorSchemeCommand } from "../Command/GetColorSchemeCommand.mjs";
+import { GetForegroundCommand } from "../Command/GetForegroundCommand.mjs";
 import { GetSelectColorSchemeElementCommand } from "../Command/GetSelectColorSchemeElementCommand.mjs";
 import { GetSystemColorSchemeDetectorCommand } from "../Command/GetSystemColorSchemeDetectorCommand.mjs";
 import { GetVariableCommand } from "../Command/GetVariableCommand.mjs";
@@ -96,6 +99,26 @@ export class ColorSchemeService {
     }
 
     /**
+     * @returns {string}
+     */
+    getAccent() {
+        return GetAccentCommand.new(
+            this
+        )
+            .getAccent();
+    }
+
+    /**
+     * @returns {string}
+     */
+    getBackground() {
+        return GetBackgroundCommand.new(
+            this
+        )
+            .getBackground();
+    }
+
+    /**
      * @returns {ColorSchemeWithSystemColorScheme}
      */
     getColorScheme() {
@@ -106,6 +129,16 @@ export class ColorSchemeService {
             this.#system_color_schemes
         )
             .getColorScheme();
+    }
+
+    /**
+     * @returns {string}
+     */
+    getForeground() {
+        return GetForegroundCommand.new(
+            this
+        )
+            .getForeground();
     }
 
     /**

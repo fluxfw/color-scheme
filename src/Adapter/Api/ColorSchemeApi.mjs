@@ -135,10 +135,31 @@ export class ColorSchemeApi {
     }
 
     /**
+     * @returns {string}
+     */
+    getAccent() {
+        return this.#color_scheme_service.getAccent();
+    }
+
+    /**
+     * @returns {string}
+     */
+    getBackground() {
+        return this.#color_scheme_service.getBackground();
+    }
+
+    /**
      * @returns {ColorSchemeWithSystemColorScheme}
      */
     getColorScheme() {
         return this.#color_scheme_service.getColorScheme();
+    }
+
+    /**
+     * @returns {string}
+     */
+    getForeground() {
+        return this.#color_scheme_service.getForeground();
     }
 
     /**

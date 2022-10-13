@@ -63,6 +63,13 @@ export class RenderColorSchemeCommand {
             document.head.appendChild(color_scheme_meta);
         }
 
+        const theme_color_meta = document.head.querySelector("meta[name=theme-color]") ?? document.createElement("meta");
+        theme_color_meta.content = this.#color_scheme_service.getAccent();
+        theme_color_meta.name = "theme-color";
+        if (!theme_color_meta.isConnected) {
+            document.head.appendChild(theme_color_meta);
+        }
+
         for (const color_scheme_change_listener of this.#get_color_scheme_change_listeners()) {
             color_scheme_change_listener(
                 color_scheme
