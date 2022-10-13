@@ -1,4 +1,4 @@
-import { VARIABLE_BACKGROUND, VARIABLE_FOREGROUND } from "../../../Adapter/ColorScheme/VARIABLE.mjs";
+import { VARIABLE_ACCENT, VARIABLE_BACKGROUND, VARIABLE_FOREGROUND } from "../../../Adapter/ColorScheme/VARIABLE.mjs";
 
 export class GetVariablesCommand {
     /**
@@ -31,6 +31,7 @@ export class GetVariablesCommand {
     getVariables(only_default = false) {
         return [
             ...new Set([
+                VARIABLE_ACCENT,
                 VARIABLE_BACKGROUND,
                 VARIABLE_FOREGROUND,
                 ...(!only_default ? this.#additional_variables : null) ?? []
