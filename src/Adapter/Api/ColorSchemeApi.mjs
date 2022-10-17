@@ -1,8 +1,8 @@
 import { COLOR_SCHEME_LOCALIZATION_MODULE } from "../Localization/_LOCALIZATION_MODULE.mjs";
-import { ColorSchemeService } from "../../Service/ColorScheme/Port/ColorSchemeService.mjs";
 
 /** @typedef {import("../ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("../ColorScheme/colorSchemeChangeListener.mjs").colorSchemeChangeListener} colorSchemeChangeListener */
+/** @typedef {import("../../Service/ColorScheme/Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
 /** @typedef {import("../ColorScheme/ColorSchemeWithSystemColorScheme.mjs").ColorSchemeWithSystemColorScheme} ColorSchemeWithSystemColorScheme */
 /** @typedef {import("../../../../flux-css-api/src/Adapter/Api/CssApi.mjs").CssApi} CssApi */
 /** @typedef {import("../../../../flux-localization-api/src/Adapter/Api/LocalizationApi.mjs").LocalizationApi} LocalizationApi */
@@ -93,7 +93,7 @@ export class ColorSchemeApi {
      * @returns {Promise<void>}
      */
     async init() {
-        this.#color_scheme_service ??= this.#getColorSchemeService();
+        this.#color_scheme_service ??= await this.#getColorSchemeService();
 
         if (this.#system_color_scheme_detector === null) {
             this.#system_color_scheme_detector ??= this.#getSystemColorSchemeDetector();
@@ -190,10 +190,10 @@ export class ColorSchemeApi {
     }
 
     /**
-     * @returns {ColorSchemeService}
+     * @returns {Promise<ColorSchemeService>}
      */
-    #getColorSchemeService() {
-        return ColorSchemeService.new(
+    async #getColorSchemeService() {
+        return (await import("../../Service/ColorScheme/Port/ColorSchemeService.mjs")).ColorSchemeService.new(
             this.#color_schemes,
             this.#css_api,
             () => this.#color_scheme_change_listeners,
