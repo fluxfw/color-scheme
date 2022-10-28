@@ -2,8 +2,6 @@ import { GetAccentCommand } from "../Command/GetAccentCommand.mjs";
 import { GetBackgroundCommand } from "../Command/GetBackgroundCommand.mjs";
 import { GetColorSchemeCommand } from "../Command/GetColorSchemeCommand.mjs";
 import { GetForegroundCommand } from "../Command/GetForegroundCommand.mjs";
-import { GetSelectColorSchemeElementCommand } from "../Command/GetSelectColorSchemeElementCommand.mjs";
-import { GetSystemColorSchemeDetectorCommand } from "../Command/GetSystemColorSchemeDetectorCommand.mjs";
 import { GetVariableCommand } from "../Command/GetVariableCommand.mjs";
 import { GetVariablesCommand } from "../Command/GetVariablesCommand.mjs";
 import { RenderColorSchemeCommand } from "../Command/RenderColorSchemeCommand.mjs";
@@ -142,10 +140,10 @@ export class ColorSchemeService {
     }
 
     /**
-     * @returns {SelectColorSchemeElement}
+     * @returns {Promise<SelectColorSchemeElement>}
      */
-    getSelectColorSchemeElement() {
-        return GetSelectColorSchemeElementCommand.new(
+    async getSelectColorSchemeElement() {
+        return (await import("../Command/GetSelectColorSchemeElementCommand.mjs")).GetSelectColorSchemeElementCommand.new(
             this,
             this.#color_schemes,
             this.#css_api,
@@ -156,10 +154,10 @@ export class ColorSchemeService {
     }
 
     /**
-     * @returns {MediaQueryList}
+     * @returns {Promise<MediaQueryList>}
      */
-    getSystemColorSchemeDetector() {
-        return GetSystemColorSchemeDetectorCommand.new()
+    async getSystemColorSchemeDetector() {
+        return (await import("../Command/GetSystemColorSchemeDetectorCommand.mjs")).GetSystemColorSchemeDetectorCommand.new()
             .getSystemColorSchemeDetector();
     }
 
