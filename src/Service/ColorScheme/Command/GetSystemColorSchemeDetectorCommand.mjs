@@ -16,9 +16,9 @@ export class GetSystemColorSchemeDetectorCommand {
     }
 
     /**
-     * @returns {MediaQueryList}
+     * @returns {Promise<MediaQueryList>}
      */
-    getSystemColorSchemeDetector() {
+    async getSystemColorSchemeDetector() {
         return matchMedia(`(prefers-color-scheme:${COLOR_SCHEME_DARK})`);
     }
 }

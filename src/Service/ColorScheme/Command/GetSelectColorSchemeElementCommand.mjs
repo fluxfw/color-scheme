@@ -1,9 +1,8 @@
-import { SelectColorSchemeElement } from "../../../Adapter/ColorScheme/SelectColorSchemeElement.mjs";
-
 /** @typedef {import("../../../Adapter/ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("../Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
 /** @typedef {import("../../../../../flux-css-api/src/Adapter/Api/CssApi.mjs").CssApi} CssApi */
 /** @typedef {import("../../../../../flux-localization-api/src/Adapter/Api/LocalizationApi.mjs").LocalizationApi} LocalizationApi */
+/** @typedef {import("../../../Adapter/ColorScheme/SelectColorSchemeElement.mjs").SelectColorSchemeElement} SelectColorSchemeElement */
 /** @typedef {import("../../../Adapter/ColorScheme/SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
 export class GetSelectColorSchemeElementCommand {
@@ -63,10 +62,10 @@ export class GetSelectColorSchemeElementCommand {
     }
 
     /**
-     * @returns {SelectColorSchemeElement}
+     * @returns {Promise<SelectColorSchemeElement>}
      */
-    getSelectColorSchemeElement() {
-        return SelectColorSchemeElement.new(
+    async getSelectColorSchemeElement() {
+        return (await import("../../../Adapter/ColorScheme/SelectColorSchemeElement.mjs")).SelectColorSchemeElement.new(
             this.#color_scheme_service.getColorScheme(),
             this.#color_schemes,
             this.#css_api,

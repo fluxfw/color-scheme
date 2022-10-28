@@ -96,7 +96,7 @@ export class ColorSchemeApi {
         this.#color_scheme_service ??= await this.#getColorSchemeService();
 
         if (this.#system_color_scheme_detector === null) {
-            this.#system_color_scheme_detector ??= this.#getSystemColorSchemeDetector();
+            this.#system_color_scheme_detector ??= await this.#getSystemColorSchemeDetector();
 
             this.#system_color_scheme_detector.addEventListener("change", () => {
                 this.renderColorScheme(
@@ -163,9 +163,9 @@ export class ColorSchemeApi {
     }
 
     /**
-     * @returns {SelectColorSchemeElement}
+     * @returns {Promise<SelectColorSchemeElement>}
      */
-    getSelectColorSchemeElement() {
+    async getSelectColorSchemeElement() {
         return this.#color_scheme_service.getSelectColorSchemeElement();
     }
 
@@ -206,9 +206,9 @@ export class ColorSchemeApi {
     }
 
     /**
-     * @returns {MediaQueryList}
+     * @returns {Promise<MediaQueryList>}
      */
-    #getSystemColorSchemeDetector() {
+    async #getSystemColorSchemeDetector() {
         return this.#color_scheme_service.getSystemColorSchemeDetector();
     }
 }
