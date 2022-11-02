@@ -27,9 +27,9 @@ export class GetForegroundCommand {
     }
 
     /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getForeground() {
+    async getForeground() {
         return this.#color_scheme_service.getVariable(
             VARIABLE_FOREGROUND
         );

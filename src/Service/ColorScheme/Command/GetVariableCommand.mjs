@@ -17,9 +17,9 @@ export class GetVariableCommand {
 
     /**
      * @param {string} variable
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getVariable(variable) {
+    async getVariable(variable) {
         return getComputedStyle(document.documentElement).getPropertyValue(`${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${variable}`).trim();
     }
 }

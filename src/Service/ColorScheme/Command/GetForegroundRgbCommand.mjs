@@ -1,8 +1,8 @@
-import { VARIABLE_BACKGROUND } from "../../../Adapter/ColorScheme/VARIABLE.mjs";
+import { VARIABLE_FOREGROUND_RGB } from "../../../Adapter/ColorScheme/VARIABLE.mjs";
 
 /** @typedef {import("../Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
 
-export class GetBackgroundCommand {
+export class GetForegroundRgbCommand {
     /**
      * @type {ColorSchemeService}
      */
@@ -10,7 +10,7 @@ export class GetBackgroundCommand {
 
     /**
      * @param {ColorSchemeService} color_scheme_service
-     * @returns {GetBackgroundCommand}
+     * @returns {GetForegroundRgbCommand}
      */
     static new(color_scheme_service) {
         return new this(
@@ -29,9 +29,9 @@ export class GetBackgroundCommand {
     /**
      * @returns {Promise<string>}
      */
-    async getBackground() {
+    async getForegroundRgb() {
         return this.#color_scheme_service.getVariable(
-            VARIABLE_BACKGROUND
+            VARIABLE_FOREGROUND_RGB
         );
     }
 }

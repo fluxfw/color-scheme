@@ -27,9 +27,9 @@ export class GetAccentCommand {
     }
 
     /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getAccent() {
+    async getAccent() {
         return this.#color_scheme_service.getVariable(
             VARIABLE_ACCENT
         );

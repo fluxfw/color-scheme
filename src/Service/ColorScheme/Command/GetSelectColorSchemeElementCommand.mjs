@@ -66,7 +66,7 @@ export class GetSelectColorSchemeElementCommand {
      */
     async getSelectColorSchemeElement() {
         return (await import("../../../Adapter/ColorScheme/SelectColorSchemeElement.mjs")).SelectColorSchemeElement.new(
-            this.#color_scheme_service.getColorScheme(),
+            await this.#color_scheme_service.getColorScheme(),
             this.#color_schemes,
             this.#css_api,
             this.#localization_api,
@@ -75,7 +75,7 @@ export class GetSelectColorSchemeElementCommand {
                     color_scheme_name
                 );
             },
-            this.#color_scheme_service.getVariables(
+            await this.#color_scheme_service.getVariables(
                 true
             ),
             this.#system_color_schemes

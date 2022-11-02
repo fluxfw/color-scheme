@@ -1,12 +1,3 @@
-import { GetAccentCommand } from "../Command/GetAccentCommand.mjs";
-import { GetBackgroundCommand } from "../Command/GetBackgroundCommand.mjs";
-import { GetColorSchemeCommand } from "../Command/GetColorSchemeCommand.mjs";
-import { GetForegroundCommand } from "../Command/GetForegroundCommand.mjs";
-import { GetVariableCommand } from "../Command/GetVariableCommand.mjs";
-import { GetVariablesCommand } from "../Command/GetVariablesCommand.mjs";
-import { RenderColorSchemeCommand } from "../Command/RenderColorSchemeCommand.mjs";
-import { SetColorSchemeCommand } from "../Command/SetColorSchemeCommand.mjs";
-
 /** @typedef {import("../../../Adapter/ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("../../../Adapter/ColorScheme/ColorSchemeWithSystemColorScheme.mjs").ColorSchemeWithSystemColorScheme} ColorSchemeWithSystemColorScheme */
 /** @typedef {import("../../../Adapter/ColorScheme/getColorSchemeChangeListeners.mjs").getColorSchemeChangeListeners} getColorSchemeChangeListeners */
@@ -97,30 +88,70 @@ export class ColorSchemeService {
     }
 
     /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getAccent() {
-        return GetAccentCommand.new(
+    async getAccent() {
+        return (await import("../Command/GetAccentCommand.mjs")).GetAccentCommand.new(
             this
         )
             .getAccent();
     }
 
     /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getBackground() {
-        return GetBackgroundCommand.new(
+    async getAccentForeground() {
+        return (await import("../Command/GetAccentForegroundCommand.mjs")).GetAccentForegroundCommand.new(
+            this
+        )
+            .getAccentForeground();
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getAccentForegroundRgb() {
+        return (await import("../Command/GetAccentForegroundRgbCommand.mjs")).GetAccentForegroundRgbCommand.new(
+            this
+        )
+            .getAccentForegroundRgb();
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getAccentRgb() {
+        return (await import("../Command/GetAccentRgbCommand.mjs")).GetAccentRgbCommand.new(
+            this
+        )
+            .getAccentRgb();
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getBackground() {
+        return (await import("../Command/GetBackgroundCommand.mjs")).GetBackgroundCommand.new(
             this
         )
             .getBackground();
     }
 
     /**
-     * @returns {ColorSchemeWithSystemColorScheme}
+     * @returns {Promise<string>}
      */
-    getColorScheme() {
-        return GetColorSchemeCommand.new(
+    async getBackgroundRgb() {
+        return (await import("../Command/GetBackgroundRgbCommand.mjs")).GetBackgroundRgbCommand.new(
+            this
+        )
+            .getBackgroundRgb();
+    }
+
+    /**
+     * @returns {Promise<ColorSchemeWithSystemColorScheme>}
+     */
+    async getColorScheme() {
+        return (await import("../Command/GetColorSchemeCommand.mjs")).GetColorSchemeCommand.new(
             this.#color_schemes,
             this.#get_system_color_scheme_detector,
             this.#settings_api,
@@ -130,13 +161,23 @@ export class ColorSchemeService {
     }
 
     /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getForeground() {
-        return GetForegroundCommand.new(
+    async getForeground() {
+        return (await import("../Command/GetForegroundCommand.mjs")).GetForegroundCommand.new(
             this
         )
             .getForeground();
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getForegroundRgb() {
+        return (await import("../Command/GetForegroundRgbCommand.mjs")).GetForegroundRgbCommand.new(
+            this
+        )
+            .getForegroundRgb();
     }
 
     /**
@@ -163,10 +204,10 @@ export class ColorSchemeService {
 
     /**
      * @param {string} variable
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getVariable(variable) {
-        return GetVariableCommand.new()
+    async getVariable(variable) {
+        return (await import("../Command/GetVariableCommand.mjs")).GetVariableCommand.new()
             .getVariable(
                 variable
             );
@@ -174,10 +215,10 @@ export class ColorSchemeService {
 
     /**
      * @param {boolean} only_default
-     * @returns {string[]}
+     * @returns {Promise<string[]>}
      */
-    getVariables(only_default = false) {
-        return GetVariablesCommand.new(
+    async getVariables(only_default = false) {
+        return (await import("../Command/GetVariablesCommand.mjs")).GetVariablesCommand.new(
             this.#additional_variables
         )
             .getVariables(
@@ -187,10 +228,10 @@ export class ColorSchemeService {
 
     /**
      * @param {boolean} only_if_system_color_scheme
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    renderColorScheme(only_if_system_color_scheme = false) {
-        RenderColorSchemeCommand.new(
+    async renderColorScheme(only_if_system_color_scheme = false) {
+        await (await import("../Command/RenderColorSchemeCommand.mjs")).RenderColorSchemeCommand.new(
             this,
             this.#get_color_scheme_change_listeners
         )
@@ -201,10 +242,10 @@ export class ColorSchemeService {
 
     /**
      * @param {string} color_scheme_name
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    setColorScheme(color_scheme_name) {
-        SetColorSchemeCommand.new(
+    async setColorScheme(color_scheme_name) {
+        await (await import("../Command/SetColorSchemeCommand.mjs")).SetColorSchemeCommand.new(
             this,
             this.#settings_api
         )

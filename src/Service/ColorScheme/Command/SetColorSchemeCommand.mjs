@@ -37,14 +37,14 @@ export class SetColorSchemeCommand {
 
     /**
      * @param {string} color_scheme_name
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    setColorScheme(color_scheme_name) {
+    async setColorScheme(color_scheme_name) {
         this.#settings_api.store(
             COLOR_SCHEME_SETTINGS_KEY,
             color_scheme_name
         );
 
-        this.#color_scheme_service.renderColorScheme();
+        await this.#color_scheme_service.renderColorScheme();
     }
 }
