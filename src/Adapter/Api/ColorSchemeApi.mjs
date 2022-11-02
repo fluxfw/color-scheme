@@ -93,8 +93,6 @@ export class ColorSchemeApi {
      * @returns {Promise<void>}
      */
     async init() {
-        this.#color_scheme_service ??= await this.#getColorSchemeService();
-
         if (this.#system_color_scheme_detector === null) {
             this.#system_color_scheme_detector ??= await this.#getSystemColorSchemeDetector();
 
@@ -119,7 +117,7 @@ export class ColorSchemeApi {
             `${__dirname}/../ColorScheme/SelectColorSchemeVariables.css`
         );
 
-        this.renderColorScheme();
+        await this.renderColorScheme();
     }
 
     /**
@@ -135,56 +133,91 @@ export class ColorSchemeApi {
     }
 
     /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getAccent() {
-        return this.#color_scheme_service.getAccent();
+    async getAccent() {
+        return (await this.#getColorSchemeService()).getAccent();
     }
 
     /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getBackground() {
-        return this.#color_scheme_service.getBackground();
+    async getAccentForeground() {
+        return (await this.#getColorSchemeService()).getAccentForeground();
     }
 
     /**
-     * @returns {ColorSchemeWithSystemColorScheme}
+     * @returns {Promise<string>}
      */
-    getColorScheme() {
-        return this.#color_scheme_service.getColorScheme();
+    async getAccentForegroundRgb() {
+        return (await this.#getColorSchemeService()).getAccentForegroundRgb();
     }
 
     /**
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getForeground() {
-        return this.#color_scheme_service.getForeground();
+    async getAccentRgb() {
+        return (await this.#getColorSchemeService()).getAccentRgb();
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getBackground() {
+        return (await this.#getColorSchemeService()).getBackground();
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getBackgroundRgb() {
+        return (await this.#getColorSchemeService()).getBackgroundRgb();
+    }
+
+    /**
+     * @returns {Promise<ColorSchemeWithSystemColorScheme>}
+     */
+    async getColorScheme() {
+        return (await this.#getColorSchemeService()).getColorScheme();
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getForeground() {
+        return (await this.#getColorSchemeService()).getForeground();
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getForegroundRgb() {
+        return (await this.#getColorSchemeService()).getForegroundRgb();
     }
 
     /**
      * @returns {Promise<SelectColorSchemeElement>}
      */
     async getSelectColorSchemeElement() {
-        return this.#color_scheme_service.getSelectColorSchemeElement();
+        return (await this.#getColorSchemeService()).getSelectColorSchemeElement();
     }
 
     /**
      * @param {string} variable
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    getVariable(variable) {
-        return this.#color_scheme_service.getVariable(
+    async getVariable(variable) {
+        return (await this.#getColorSchemeService()).getVariable(
             variable
         );
     }
 
     /**
      * @param {boolean} only_if_system_color_scheme
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    renderColorScheme(only_if_system_color_scheme = false) {
-        this.#color_scheme_service.renderColorScheme(
+    async renderColorScheme(only_if_system_color_scheme = false) {
+        await (await this.#getColorSchemeService()).renderColorScheme(
             only_if_system_color_scheme
         );
     }
@@ -193,7 +226,7 @@ export class ColorSchemeApi {
      * @returns {Promise<ColorSchemeService>}
      */
     async #getColorSchemeService() {
-        return (await import("../../Service/ColorScheme/Port/ColorSchemeService.mjs")).ColorSchemeService.new(
+        this.#color_scheme_service ??= (await import("../../Service/ColorScheme/Port/ColorSchemeService.mjs")).ColorSchemeService.new(
             this.#color_schemes,
             this.#css_api,
             () => this.#color_scheme_change_listeners,
@@ -203,12 +236,14 @@ export class ColorSchemeApi {
             this.#system_color_schemes,
             this.#additional_variables
         );
+
+        return this.#color_scheme_service;
     }
 
     /**
      * @returns {Promise<MediaQueryList>}
      */
     async #getSystemColorSchemeDetector() {
-        return this.#color_scheme_service.getSystemColorSchemeDetector();
+        return (await this.#getColorSchemeService()).getSystemColorSchemeDetector();
     }
 }

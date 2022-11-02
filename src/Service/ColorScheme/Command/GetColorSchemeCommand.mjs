@@ -55,9 +55,9 @@ export class GetColorSchemeCommand {
     }
 
     /**
-     * @returns {ColorSchemeWithSystemColorScheme}
+     * @returns {Promise<ColorSchemeWithSystemColorScheme>}
      */
-    getColorScheme() {
+    async getColorScheme() {
         let color_scheme_name = this.#settings_api.get(
             COLOR_SCHEME_SETTINGS_KEY,
             ""

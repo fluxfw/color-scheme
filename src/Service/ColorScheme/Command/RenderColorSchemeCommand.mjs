@@ -38,10 +38,10 @@ export class RenderColorSchemeCommand {
 
     /**
      * @param {boolean} only_if_system_color_scheme
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    renderColorScheme(only_if_system_color_scheme = false) {
-        const color_scheme = this.#color_scheme_service.getColorScheme();
+    async renderColorScheme(only_if_system_color_scheme = false) {
+        const color_scheme = await this.#color_scheme_service.getColorScheme();
 
         if (only_if_system_color_scheme && !color_scheme.system_color_scheme) {
             return;
@@ -52,7 +52,7 @@ export class RenderColorSchemeCommand {
         ].filter(_key => _key.startsWith(COLOR_SCHEME_CSS_PROPERTY_PREFIX))) {
             document.documentElement.style.removeProperty(key);
         }
-        for (const variable of this.#color_scheme_service.getVariables()) {
+        for (const variable of await this.#color_scheme_service.getVariables()) {
             document.documentElement.style.setProperty(`${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${variable}`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${color_scheme.name}-${variable})`);
         }
 
@@ -64,7 +64,7 @@ export class RenderColorSchemeCommand {
         }
 
         const theme_color_meta = document.head.querySelector("meta[name=theme-color]") ?? document.createElement("meta");
-        theme_color_meta.content = this.#color_scheme_service.getAccent();
+        theme_color_meta.content = await this.#color_scheme_service.getAccent();
         theme_color_meta.name = "theme-color";
         if (!theme_color_meta.isConnected) {
             document.head.appendChild(theme_color_meta);
