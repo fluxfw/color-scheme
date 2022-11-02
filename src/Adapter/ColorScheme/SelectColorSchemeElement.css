@@ -21,7 +21,6 @@
 .color_scheme {
     --select-color-scheme-color-scheme-color: var(--color-scheme-background, #ffffff);
     --select-color-scheme-color-scheme-selected-color: var(--color-scheme-foreground, #000000);
-    all: initial;
     background-color: var(--select-color-scheme-color-scheme-color);
     border-radius: 40px;
     border: 3px solid #888888;
