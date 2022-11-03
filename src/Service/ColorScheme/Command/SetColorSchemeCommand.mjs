@@ -40,7 +40,7 @@ export class SetColorSchemeCommand {
      * @returns {Promise<void>}
      */
     async setColorScheme(color_scheme_name) {
-        this.#settings_api.store(
+        await this.#settings_api.store(
             COLOR_SCHEME_SETTINGS_KEY,
             color_scheme_name
         );

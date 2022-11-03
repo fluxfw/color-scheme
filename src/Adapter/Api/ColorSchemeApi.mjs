@@ -122,13 +122,13 @@ export class ColorSchemeApi {
 
     /**
      * @param {colorSchemeChangeListener} color_scheme_change_listener
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    addColorSchemeChangeListener(color_scheme_change_listener) {
+    async addColorSchemeChangeListener(color_scheme_change_listener) {
         this.#color_scheme_change_listeners.push(color_scheme_change_listener);
 
         color_scheme_change_listener(
-            this.getColorScheme()
+            await this.getColorScheme()
         );
     }
 
