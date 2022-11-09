@@ -1,7 +1,6 @@
 import { COLOR_SCHEME_LOCALIZATION_MODULE } from "../Localization/_LOCALIZATION_MODULE.mjs";
 
 /** @typedef {import("../ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
-/** @typedef {import("../ColorScheme/colorSchemeChangeListener.mjs").colorSchemeChangeListener} colorSchemeChangeListener */
 /** @typedef {import("../../Service/ColorScheme/Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
 /** @typedef {import("../ColorScheme/ColorSchemeWithSystemColorScheme.mjs").ColorSchemeWithSystemColorScheme} ColorSchemeWithSystemColorScheme */
 /** @typedef {import("../../../../flux-css-api/src/Adapter/Api/CssApi.mjs").CssApi} CssApi */
@@ -17,10 +16,6 @@ export class ColorSchemeApi {
      * @type {string[] | null}
      */
     #additional_variables;
-    /**
-     * @type {colorSchemeChangeListener[]}
-     */
-    #color_scheme_change_listeners;
     /**
      * @type {ColorSchemeService | null}
      */
@@ -86,7 +81,6 @@ export class ColorSchemeApi {
         this.#settings_api = settings_api;
         this.#system_color_schemes = system_color_schemes;
         this.#additional_variables = additional_variables;
-        this.#color_scheme_change_listeners = [];
     }
 
     /**
@@ -103,7 +97,7 @@ export class ColorSchemeApi {
             });
         }
 
-        this.#localization_api.addModule(
+        await this.#localization_api.addModule(
             `${__dirname}/../Localization`,
             COLOR_SCHEME_LOCALIZATION_MODULE
         );
@@ -118,18 +112,6 @@ export class ColorSchemeApi {
         );
 
         await this.renderColorScheme();
-    }
-
-    /**
-     * @param {colorSchemeChangeListener} color_scheme_change_listener
-     * @returns {Promise<void>}
-     */
-    async addColorSchemeChangeListener(color_scheme_change_listener) {
-        this.#color_scheme_change_listeners.push(color_scheme_change_listener);
-
-        color_scheme_change_listener(
-            await this.getColorScheme()
-        );
     }
 
     /**
@@ -229,7 +211,6 @@ export class ColorSchemeApi {
         this.#color_scheme_service ??= (await import("../../Service/ColorScheme/Port/ColorSchemeService.mjs")).ColorSchemeService.new(
             this.#color_schemes,
             this.#css_api,
-            () => this.#color_scheme_change_listeners,
             () => this.#system_color_scheme_detector,
             this.#localization_api,
             this.#settings_api,

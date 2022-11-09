@@ -1,6 +1,5 @@
 /** @typedef {import("../../../Adapter/ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("../../../Adapter/ColorScheme/ColorSchemeWithSystemColorScheme.mjs").ColorSchemeWithSystemColorScheme} ColorSchemeWithSystemColorScheme */
-/** @typedef {import("../../../Adapter/ColorScheme/getColorSchemeChangeListeners.mjs").getColorSchemeChangeListeners} getColorSchemeChangeListeners */
 /** @typedef {import("../../../../../flux-css-api/src/Adapter/Api/CssApi.mjs").CssApi} CssApi */
 /** @typedef {import("../../../../../flux-localization-api/src/Adapter/Api/LocalizationApi.mjs").LocalizationApi} LocalizationApi */
 /** @typedef {import("../../../Adapter/ColorScheme/SelectColorSchemeElement.mjs").SelectColorSchemeElement} SelectColorSchemeElement */
@@ -21,10 +20,6 @@ export class ColorSchemeService {
      */
     #css_api;
     /**
-     * @type {getColorSchemeChangeListeners}
-     */
-    #get_color_scheme_change_listeners;
-    /**
      * @type {() => MediaQueryList}
      */
     #get_system_color_scheme_detector;
@@ -44,7 +39,6 @@ export class ColorSchemeService {
     /**
      * @param {ColorScheme[]} color_schemes
      * @param {CssApi} css_api
-     * @param {getColorSchemeChangeListeners} get_color_scheme_change_listeners
      * @param {() => MediaQueryList} get_system_color_scheme_detector
      * @param {LocalizationApi} localization_api
      * @param {SettingsApi} settings_api
@@ -52,11 +46,10 @@ export class ColorSchemeService {
      * @param {string[] | null} additional_variables
      * @returns {ColorSchemeService}
      */
-    static new(color_schemes, css_api, get_color_scheme_change_listeners, get_system_color_scheme_detector, localization_api, settings_api, system_color_schemes = null, additional_variables = null) {
+    static new(color_schemes, css_api, get_system_color_scheme_detector, localization_api, settings_api, system_color_schemes = null, additional_variables = null) {
         return new this(
             color_schemes,
             css_api,
-            get_color_scheme_change_listeners,
             get_system_color_scheme_detector,
             localization_api,
             settings_api,
@@ -68,7 +61,6 @@ export class ColorSchemeService {
     /**
      * @param {ColorScheme[]} color_schemes
      * @param {CssApi} css_api
-     * @param {getColorSchemeChangeListeners} get_color_scheme_change_listeners
      * @param {() => MediaQueryList} get_system_color_scheme_detector
      * @param {LocalizationApi} localization_api
      * @param {SettingsApi} settings_api
@@ -76,10 +68,9 @@ export class ColorSchemeService {
      * @param {string[] | null} additional_variables
      * @private
      */
-    constructor(color_schemes, css_api, get_color_scheme_change_listeners, get_system_color_scheme_detector, localization_api, settings_api, system_color_schemes, additional_variables) {
+    constructor(color_schemes, css_api, get_system_color_scheme_detector, localization_api, settings_api, system_color_schemes, additional_variables) {
         this.#color_schemes = color_schemes;
         this.#css_api = css_api;
-        this.#get_color_scheme_change_listeners = get_color_scheme_change_listeners;
         this.#get_system_color_scheme_detector = get_system_color_scheme_detector;
         this.#localization_api = localization_api;
         this.#settings_api = settings_api;
@@ -232,8 +223,7 @@ export class ColorSchemeService {
      */
     async renderColorScheme(only_if_system_color_scheme = false) {
         await (await import("../Command/RenderColorSchemeCommand.mjs")).RenderColorSchemeCommand.new(
-            this,
-            this.#get_color_scheme_change_listeners
+            this
         )
             .renderColorScheme(
                 only_if_system_color_scheme
