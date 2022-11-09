@@ -107,12 +107,12 @@ export class SelectColorSchemeElement extends HTMLElement {
     }
 
     /**
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    #render() {
+    async #render() {
         const title = document.createElement("div");
         title.classList.add("title");
-        title.innerText = this.#localization_api.translate(
+        title.innerText = await this.#localization_api.translate(
             "Color scheme",
             COLOR_SCHEME_LOCALIZATION_MODULE
         );
@@ -125,7 +125,7 @@ export class SelectColorSchemeElement extends HTMLElement {
             const system_color_scheme_element = document.createElement("div");
             system_color_scheme_element.classList.add("color_scheme");
             system_color_scheme_element.dataset.system = true;
-            system_color_scheme_element.title = this.#localization_api.translate(
+            system_color_scheme_element.title = await this.#localization_api.translate(
                 "Use system color scheme ({light_color_scheme}/{dark_color_scheme})",
                 COLOR_SCHEME_LOCALIZATION_MODULE,
                 {

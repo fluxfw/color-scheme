@@ -2,38 +2,29 @@ import { COLOR_SCHEME_CSS_PROPERTY_PREFIX } from "../../../Adapter/ColorScheme/C
 import { COLOR_SCHEME_LIGHT } from "../../../Adapter/ColorScheme/COLOR_SCHEME.mjs";
 
 /** @typedef {import("../Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
-/** @typedef {import("../../../Adapter/ColorScheme/getColorSchemeChangeListeners.mjs").getColorSchemeChangeListeners} getColorSchemeChangeListeners */
 
 export class RenderColorSchemeCommand {
     /**
      * @type {ColorSchemeService}
      */
     #color_scheme_service;
-    /**
-     * @type {getColorSchemeChangeListeners}
-     */
-    #get_color_scheme_change_listeners;
 
     /**
      * @param {ColorSchemeService} color_scheme_service
-     * @param {getColorSchemeChangeListeners} get_color_scheme_change_listeners
      * @returns {RenderColorSchemeCommand}
      */
-    static new(color_scheme_service, get_color_scheme_change_listeners) {
+    static new(color_scheme_service) {
         return new this(
-            color_scheme_service,
-            get_color_scheme_change_listeners
+            color_scheme_service
         );
     }
 
     /**
      * @param {ColorSchemeService} color_scheme_service
-     * @param {getColorSchemeChangeListeners} get_color_scheme_change_listeners
      * @private
      */
-    constructor(color_scheme_service, get_color_scheme_change_listeners) {
+    constructor(color_scheme_service) {
         this.#color_scheme_service = color_scheme_service;
-        this.#get_color_scheme_change_listeners = get_color_scheme_change_listeners;
     }
 
     /**
@@ -68,12 +59,6 @@ export class RenderColorSchemeCommand {
         theme_color_meta.name = "theme-color";
         if (!theme_color_meta.isConnected) {
             document.head.appendChild(theme_color_meta);
-        }
-
-        for (const color_scheme_change_listener of this.#get_color_scheme_change_listeners()) {
-            color_scheme_change_listener(
-                color_scheme
-            );
         }
     }
 }
