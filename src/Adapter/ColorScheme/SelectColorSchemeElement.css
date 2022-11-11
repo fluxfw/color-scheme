@@ -12,6 +12,7 @@
 .color_schemes {
     display: flex;
     flex-direction: row;
+    flex-wrap: nowrap;
     height: 60px;
     overflow-x: auto;
     overflow-y: visible;
