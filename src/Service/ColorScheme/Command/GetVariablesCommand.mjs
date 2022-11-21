@@ -29,18 +29,16 @@ export class GetVariablesCommand {
      * @returns {Promise<string[]>}
      */
     async getVariables(only_default = false) {
-        return [
-            ...new Set([
-                VARIABLE_ACCENT,
-                VARIABLE_ACCENT_FOREGROUND,
-                VARIABLE_ACCENT_FOREGROUND_RGB,
-                VARIABLE_ACCENT_RGB,
-                VARIABLE_BACKGROUND,
-                VARIABLE_BACKGROUND_RGB,
-                VARIABLE_FOREGROUND,
-                VARIABLE_FOREGROUND_RGB,
-                ...(!only_default ? this.#additional_variables : null) ?? []
-            ])
-        ];
+        return Array.from(new Set([
+            VARIABLE_ACCENT,
+            VARIABLE_ACCENT_FOREGROUND,
+            VARIABLE_ACCENT_FOREGROUND_RGB,
+            VARIABLE_ACCENT_RGB,
+            VARIABLE_BACKGROUND,
+            VARIABLE_BACKGROUND_RGB,
+            VARIABLE_FOREGROUND,
+            VARIABLE_FOREGROUND_RGB,
+            ...(!only_default ? this.#additional_variables : null) ?? []
+        ]));
     }
 }
