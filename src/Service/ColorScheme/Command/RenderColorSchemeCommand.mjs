@@ -38,9 +38,7 @@ export class RenderColorSchemeCommand {
             return;
         }
 
-        for (const key of [
-            ...document.documentElement.style
-        ].filter(_key => _key.startsWith(COLOR_SCHEME_CSS_PROPERTY_PREFIX))) {
+        for (const key of Array.from(document.documentElement.style).filter(_key => _key.startsWith(COLOR_SCHEME_CSS_PROPERTY_PREFIX))) {
             document.documentElement.style.removeProperty(key);
         }
         for (const variable of await this.#color_scheme_service.getVariables()) {
