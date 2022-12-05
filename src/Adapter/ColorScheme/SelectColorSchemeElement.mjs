@@ -122,7 +122,7 @@ export class SelectColorSchemeElement extends HTMLElement {
         color_schemes_element.classList.add("color_schemes");
 
         if (this.#system_color_schemes !== null) {
-            const system_color_scheme_element = document.createElement("div");
+            const system_color_scheme_element = document.createElement("button");
             system_color_scheme_element.classList.add("color_scheme");
             system_color_scheme_element.dataset.system = true;
             system_color_scheme_element.title = await this.#localization_api.translate(
@@ -133,6 +133,7 @@ export class SelectColorSchemeElement extends HTMLElement {
                     dark_color_scheme: this.#system_color_schemes[COLOR_SCHEME_DARK]
                 }
             );
+            system_color_scheme_element.type = "button";
 
             if (this.#color_scheme.system_color_scheme) {
                 system_color_scheme_element.dataset.selected = true;
@@ -156,12 +157,13 @@ export class SelectColorSchemeElement extends HTMLElement {
         }
 
         for (const color_scheme of this.#color_schemes) {
-            const color_scheme_element = document.createElement("div");
+            const color_scheme_element = document.createElement("button");
             color_scheme_element.classList.add("color_scheme");
             for (const variable of this.#variables) {
                 color_scheme_element.style.setProperty(`${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${variable}`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${color_scheme.name}-${variable})`);
             }
             color_scheme_element.title = color_scheme.name;
+            color_scheme_element.type = "button";
 
             if (!this.#color_scheme.system_color_scheme && color_scheme.name === this.#color_scheme.name) {
                 color_scheme_element.dataset.selected = true;
