@@ -1,9 +1,9 @@
-/** @typedef {import("../../../Adapter/ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
+/** @typedef {import("../ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("../Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
-/** @typedef {import("../../../../../flux-css-api/src/Adapter/Api/CssApi.mjs").CssApi} CssApi */
-/** @typedef {import("../../../../../flux-localization-api/src/Adapter/Api/LocalizationApi.mjs").LocalizationApi} LocalizationApi */
-/** @typedef {import("../../../Adapter/ColorScheme/SelectColorSchemeElement.mjs").SelectColorSchemeElement} SelectColorSchemeElement */
-/** @typedef {import("../../../Adapter/ColorScheme/SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
+/** @typedef {import("../../../../flux-css-api/src/FluxCssApi.mjs").FluxCssApi} FluxCssApi */
+/** @typedef {import("../../../../flux-localization-api/src/FluxLocalizationApi.mjs").FluxLocalizationApi} FluxLocalizationApi */
+/** @typedef {import("../SelectColorSchemeElement.mjs").SelectColorSchemeElement} SelectColorSchemeElement */
+/** @typedef {import("../SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
 export class GetSelectColorSchemeElementCommand {
     /**
@@ -15,13 +15,13 @@ export class GetSelectColorSchemeElementCommand {
      */
     #color_schemes;
     /**
-     * @type {CssApi}
+     * @type {FluxCssApi}
      */
-    #css_api;
+    #flux_css_api;
     /**
-     * @type {LocalizationApi}
+     * @type {FluxLocalizationApi}
      */
-    #localization_api;
+    #flux_localization_api;
     /**
      * @type {SystemColorScheme | null}
      */
@@ -30,17 +30,17 @@ export class GetSelectColorSchemeElementCommand {
     /**
      * @param {ColorSchemeService} color_scheme_service
      * @param {ColorScheme[]} color_schemes
-     * @param {CssApi} css_api
-     * @param {LocalizationApi} localization_api
+     * @param {FluxCssApi} flux_css_api
+     * @param {FluxLocalizationApi} flux_localization_api
      * @param {SystemColorScheme | null} system_color_schemes
      * @returns {GetSelectColorSchemeElementCommand}
      */
-    static new(color_scheme_service, color_schemes, css_api, localization_api, system_color_schemes = null) {
+    static new(color_scheme_service, color_schemes, flux_css_api, flux_localization_api, system_color_schemes = null) {
         return new this(
             color_scheme_service,
             color_schemes,
-            css_api,
-            localization_api,
+            flux_css_api,
+            flux_localization_api,
             system_color_schemes
         );
     }
@@ -48,16 +48,16 @@ export class GetSelectColorSchemeElementCommand {
     /**
      * @param {ColorSchemeService} color_scheme_service
      * @param {ColorScheme[]} color_schemes
-     * @param {CssApi} css_api
-     * @param {LocalizationApi} localization_api
+     * @param {FluxCssApi} flux_css_api
+     * @param {FluxLocalizationApi} flux_localization_api
      * @param {SystemColorScheme | null} system_color_schemes
      * @private
      */
-    constructor(color_scheme_service, color_schemes, css_api, localization_api, system_color_schemes) {
+    constructor(color_scheme_service, color_schemes, flux_css_api, flux_localization_api, system_color_schemes) {
         this.#color_scheme_service = color_scheme_service;
         this.#color_schemes = color_schemes;
-        this.#css_api = css_api;
-        this.#localization_api = localization_api;
+        this.#flux_css_api = flux_css_api;
+        this.#flux_localization_api = flux_localization_api;
         this.#system_color_schemes = system_color_schemes;
     }
 
@@ -65,11 +65,11 @@ export class GetSelectColorSchemeElementCommand {
      * @returns {Promise<SelectColorSchemeElement>}
      */
     async getSelectColorSchemeElement() {
-        return (await import("../../../Adapter/ColorScheme/SelectColorSchemeElement.mjs")).SelectColorSchemeElement.new(
+        return (await import("../SelectColorSchemeElement.mjs")).SelectColorSchemeElement.new(
             await this.#color_scheme_service.getColorScheme(),
             this.#color_schemes,
-            this.#css_api,
-            this.#localization_api,
+            this.#flux_css_api,
+            this.#flux_localization_api,
             color_scheme_name => {
                 this.#color_scheme_service.setColorScheme(
                     color_scheme_name

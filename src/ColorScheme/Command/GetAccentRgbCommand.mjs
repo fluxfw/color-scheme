@@ -1,8 +1,8 @@
-import { VARIABLE_ACCENT_FOREGROUND } from "../../../Adapter/ColorScheme/VARIABLE.mjs";
+import { VARIABLE_ACCENT_RGB } from "../VARIABLE.mjs";
 
 /** @typedef {import("../Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
 
-export class GetAccentForegroundCommand {
+export class GetAccentRgbCommand {
     /**
      * @type {ColorSchemeService}
      */
@@ -10,7 +10,7 @@ export class GetAccentForegroundCommand {
 
     /**
      * @param {ColorSchemeService} color_scheme_service
-     * @returns {GetAccentForegroundCommand}
+     * @returns {GetAccentRgbCommand}
      */
     static new(color_scheme_service) {
         return new this(
@@ -29,9 +29,9 @@ export class GetAccentForegroundCommand {
     /**
      * @returns {Promise<string>}
      */
-    async getAccentForeground() {
+    async getAccentRgb() {
         return this.#color_scheme_service.getVariable(
-            VARIABLE_ACCENT_FOREGROUND
+            VARIABLE_ACCENT_RGB
         );
     }
 }

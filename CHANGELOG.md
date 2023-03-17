@@ -6,6 +6,13 @@ Changes:
 
 \-
 
+## v2023-03-17-1
+
+Changes:
+
+- Simplify
+- Renamed to `flux-color-scheme`
+
 ## v2023-02-09-1
 
 Changes:

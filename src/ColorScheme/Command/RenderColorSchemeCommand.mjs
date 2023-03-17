@@ -1,5 +1,5 @@
-import { COLOR_SCHEME_CSS_PROPERTY_PREFIX } from "../../../Adapter/ColorScheme/COLOR_SCHEME_CSS_PROPERTY_PREFIX.mjs";
-import { COLOR_SCHEME_LIGHT } from "../../../Adapter/ColorScheme/COLOR_SCHEME.mjs";
+import { COLOR_SCHEME_CSS_PROPERTY_PREFIX } from "../COLOR_SCHEME_CSS_PROPERTY_PREFIX.mjs";
+import { COLOR_SCHEME_LIGHT } from "../COLOR_SCHEME.mjs";
 
 /** @typedef {import("../Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
 

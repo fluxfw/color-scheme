@@ -1,4 +1,4 @@
-import { COLOR_SCHEME_DARK } from "../../../Adapter/ColorScheme/COLOR_SCHEME.mjs";
+import { COLOR_SCHEME_DARK } from "../COLOR_SCHEME.mjs";
 
 export class GetSystemColorSchemeDetectorCommand {
     /**

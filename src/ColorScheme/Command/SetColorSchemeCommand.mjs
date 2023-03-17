@@ -1,7 +1,7 @@
-import { COLOR_SCHEME_SETTINGS_KEY } from "../../../Adapter/Settings/COLOR_SCHEME_SETTINGS_KEY.mjs";
+import { COLOR_SCHEME_SETTINGS_KEY } from "../../Settings/COLOR_SCHEME_SETTINGS_KEY.mjs";
 
 /** @typedef {import("../Port/ColorSchemeService.mjs").ColorSchemeService} ColorSchemeService */
-/** @typedef {import("../../../../../flux-settings-api/src/Adapter/Api/SettingsApi.mjs").SettingsApi} SettingsApi */
+/** @typedef {import("../../../../flux-settings-api/src/FluxSettingsApi.mjs").FluxSettingsApi} FluxSettingsApi */
 
 export class SetColorSchemeCommand {
     /**
@@ -9,30 +9,30 @@ export class SetColorSchemeCommand {
      */
     #color_scheme_service;
     /**
-     * @type {SettingsApi}
+     * @type {FluxSettingsApi}
      */
-    #settings_api;
+    #flux_settings_api;
 
     /**
      * @param {ColorSchemeService} color_scheme_service
-     * @param {SettingsApi} settings_api
+     * @param {FluxSettingsApi} flux_settings_api
      * @returns {SetColorSchemeCommand}
      */
-    static new(color_scheme_service, settings_api) {
+    static new(color_scheme_service, flux_settings_api) {
         return new this(
             color_scheme_service,
-            settings_api
+            flux_settings_api
         );
     }
 
     /**
      * @param {ColorSchemeService} color_scheme_service
-     * @param {SettingsApi} settings_api
+     * @param {FluxSettingsApi} flux_settings_api
      * @private
      */
-    constructor(color_scheme_service, settings_api) {
+    constructor(color_scheme_service, flux_settings_api) {
         this.#color_scheme_service = color_scheme_service;
-        this.#settings_api = settings_api;
+        this.#flux_settings_api = flux_settings_api;
     }
 
     /**
@@ -40,7 +40,7 @@ export class SetColorSchemeCommand {
      * @returns {Promise<void>}
      */
     async setColorScheme(color_scheme_name) {
-        await this.#settings_api.store(
+        await this.#flux_settings_api.store(
             COLOR_SCHEME_SETTINGS_KEY,
             color_scheme_name
         );
