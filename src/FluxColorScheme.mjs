@@ -268,7 +268,7 @@ export class FluxColorScheme {
      */
     async #getSystemColorSchemeDetector() {
         if (this.#system_color_scheme_detector === null) {
-            this.#system_color_scheme_detector ??= await this.#getSystemColorSchemeDetector();
+            this.#system_color_scheme_detector ??= matchMedia(`(prefers-color-scheme:${COLOR_SCHEME_DARK})`);
 
             this.#system_color_scheme_detector.addEventListener("change", () => {
                 this.renderColorScheme(
