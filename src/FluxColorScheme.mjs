@@ -1,18 +1,31 @@
 import { COLOR_SCHEME_CSS_PROPERTY_PREFIX } from "./ColorScheme/COLOR_SCHEME_CSS_PROPERTY_PREFIX.mjs";
 import { COLOR_SCHEME_LOCALIZATION_MODULE } from "./Localization/_LOCALIZATION_MODULE.mjs";
 import { COLOR_SCHEME_SETTINGS_KEY } from "./Settings/COLOR_SCHEME_SETTINGS_KEY.mjs";
+import { flux_css_api } from "../../flux-css-api/src/FluxCssApi.mjs";
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from "./ColorScheme/COLOR_SCHEME.mjs";
 import { VARIABLE_ACCENT, VARIABLE_ACCENT_FOREGROUND, VARIABLE_ACCENT_FOREGROUND_RGB, VARIABLE_ACCENT_RGB, VARIABLE_BACKGROUND, VARIABLE_BACKGROUND_RGB, VARIABLE_FOREGROUND, VARIABLE_FOREGROUND_RGB } from "./ColorScheme/VARIABLE.mjs";
 
 /** @typedef {import("./ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("./ColorScheme/ColorSchemeWithSystemColorScheme.mjs").ColorSchemeWithSystemColorScheme} ColorSchemeWithSystemColorScheme */
-/** @typedef {import("../../flux-css-api/src/FluxCssApi.mjs").FluxCssApi} FluxCssApi */
 /** @typedef {import("../../flux-localization-api/src/FluxLocalizationApi.mjs").FluxLocalizationApi} FluxLocalizationApi */
 /** @typedef {import("../../flux-settings-api/src/FluxSettingsApi.mjs").FluxSettingsApi} FluxSettingsApi */
 /** @typedef {import("./ColorScheme/SelectColorSchemeElement.mjs").SelectColorSchemeElement} SelectColorSchemeElement */
 /** @typedef {import("./ColorScheme/SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
 const __dirname = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"));
+
+flux_css_api.adopt(
+    document,
+    await flux_css_api.import(
+        `${__dirname}/ColorScheme/ColorSchemeVariables.css`
+    )
+);
+flux_css_api.adopt(
+    document,
+    await flux_css_api.import(
+        `${__dirname}/ColorScheme/SelectColorSchemeVariables.css`
+    )
+);
 
 export class FluxColorScheme {
     /**
@@ -23,10 +36,6 @@ export class FluxColorScheme {
      * @type {ColorScheme[]}
      */
     #color_schemes;
-    /**
-     * @type {FluxCssApi}
-     */
-    #flux_css_api;
     /**
      * @type {FluxLocalizationApi}
      */
@@ -46,17 +55,15 @@ export class FluxColorScheme {
 
     /**
      * @param {ColorScheme[]} color_schemes
-     * @param {FluxCssApi} flux_css_api
      * @param {FluxLocalizationApi} flux_localization_api
      * @param {FluxSettingsApi} flux_settings_api
      * @param {SystemColorScheme | null} system_color_schemes
      * @param {string[] | null} additional_variables
      * @returns {FluxColorScheme}
      */
-    static new(color_schemes, flux_css_api, flux_localization_api, flux_settings_api, system_color_schemes = null, additional_variables = null) {
+    static new(color_schemes, flux_localization_api, flux_settings_api, system_color_schemes = null, additional_variables = null) {
         return new this(
             color_schemes,
-            flux_css_api,
             flux_localization_api,
             flux_settings_api,
             system_color_schemes,
@@ -66,41 +73,25 @@ export class FluxColorScheme {
 
     /**
      * @param {ColorScheme[]} color_schemes
-     * @param {FluxCssApi} flux_css_api
      * @param {FluxLocalizationApi} flux_localization_api
      * @param {FluxSettingsApi} flux_settings_api
      * @param {SystemColorScheme | null} system_color_schemes
      * @param {string[] | null} additional_variables
      * @private
      */
-    constructor(color_schemes, flux_css_api, flux_localization_api, flux_settings_api, system_color_schemes, additional_variables) {
+    constructor(color_schemes, flux_localization_api, flux_settings_api, system_color_schemes, additional_variables) {
         this.#color_schemes = color_schemes;
-        this.#flux_css_api = flux_css_api;
         this.#flux_localization_api = flux_localization_api;
         this.#flux_settings_api = flux_settings_api;
         this.#system_color_schemes = system_color_schemes;
         this.#additional_variables = additional_variables;
-    }
 
-    /**
-     * @returns {Promise<void>}
-     */
-    async init() {
-        await this.#flux_localization_api.addModule(
+        this.#flux_localization_api.addModule(
             `${__dirname}/Localization`,
             COLOR_SCHEME_LOCALIZATION_MODULE
         );
 
-        this.#flux_css_api.importCssToRoot(
-            document,
-            `${__dirname}/ColorScheme/ColorSchemeVariables.css`
-        );
-        this.#flux_css_api.importCssToRoot(
-            document,
-            `${__dirname}/ColorScheme/SelectColorSchemeVariables.css`
-        );
-
-        await this.renderColorScheme();
+        this.renderColorScheme();
     }
 
     /**
@@ -206,7 +197,6 @@ export class FluxColorScheme {
         return (await import("./ColorScheme/SelectColorSchemeElement.mjs")).SelectColorSchemeElement.new(
             await this.getColorScheme(),
             this.#color_schemes,
-            this.#flux_css_api,
             this.#flux_localization_api,
             color_scheme_name => {
                 this.#setColorScheme(

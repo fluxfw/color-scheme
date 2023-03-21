@@ -1,15 +1,19 @@
 import { COLOR_SCHEME_CSS_PROPERTY_PREFIX } from "./COLOR_SCHEME_CSS_PROPERTY_PREFIX.mjs";
 import { COLOR_SCHEME_LOCALIZATION_MODULE } from "../Localization/_LOCALIZATION_MODULE.mjs";
+import { flux_css_api } from "../../../flux-css-api/src/FluxCssApi.mjs";
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from "./COLOR_SCHEME.mjs";
 
 /** @typedef {import("./ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("./ColorSchemeWithSystemColorScheme.mjs").ColorSchemeWithSystemColorScheme} ColorSchemeWithSystemColorScheme */
-/** @typedef {import("../../../flux-css-api/src/FluxCssApi.mjs").FluxCssApi} FluxCssApi */
 /** @typedef {import("../../../flux-localization-api/src/FluxLocalizationApi.mjs").FluxLocalizationApi} FluxLocalizationApi */
 /** @typedef {import("./setColorScheme.mjs").setColorScheme} setColorScheme */
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
 const __dirname = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"));
+
+const css = await flux_css_api.import(
+    `${__dirname}/SelectColorSchemeElement.css`
+);
 
 export class SelectColorSchemeElement extends HTMLElement {
     /**
@@ -20,10 +24,6 @@ export class SelectColorSchemeElement extends HTMLElement {
      * @type {ColorScheme[]}
      */
     #color_schemes;
-    /**
-     * @type {FluxCssApi}
-     */
-    #flux_css_api;
     /**
      * @type {FluxLocalizationApi}
      */
@@ -48,18 +48,16 @@ export class SelectColorSchemeElement extends HTMLElement {
     /**
      * @param {ColorSchemeWithSystemColorScheme} color_scheme
      * @param {ColorScheme[]} color_schemes
-     * @param {FluxCssApi} flux_css_api
      * @param {FluxLocalizationApi} flux_localization_api
      * @param {setColorScheme} set
      * @param {string[]} variables
      * @param {SystemColorScheme | null} system_color_schemes
      * @returns {SelectColorSchemeElement}
      */
-    static new(color_scheme, color_schemes, flux_css_api, flux_localization_api, set, variables, system_color_schemes = null) {
+    static new(color_scheme, color_schemes, flux_localization_api, set, variables, system_color_schemes = null) {
         return new this(
             color_scheme,
             color_schemes,
-            flux_css_api,
             flux_localization_api,
             set,
             variables,
@@ -70,28 +68,26 @@ export class SelectColorSchemeElement extends HTMLElement {
     /**
      * @param {ColorSchemeWithSystemColorScheme} color_scheme
      * @param {ColorScheme[]} color_schemes
-     * @param {FluxCssApi} flux_css_api
      * @param {FluxLocalizationApi} flux_localization_api
      * @param {setColorScheme} set
      * @param {string[]} variables
      * @param {SystemColorScheme | null} system_color_schemes
      * @private
      */
-    constructor(color_scheme, color_schemes, flux_css_api, flux_localization_api, set, variables, system_color_schemes) {
+    constructor(color_scheme, color_schemes, flux_localization_api, set, variables, system_color_schemes) {
         super();
 
         this.#color_scheme = color_scheme;
         this.#color_schemes = color_schemes;
-        this.#flux_css_api = flux_css_api;
         this.#flux_localization_api = flux_localization_api;
         this.#set = set;
         this.#variables = variables;
         this.#system_color_schemes = system_color_schemes;
 
         this.#shadow = this.attachShadow({ mode: "closed" });
-        this.#flux_css_api.importCssToRoot(
+        flux_css_api.adopt(
             this.#shadow,
-            `${__dirname}/${this.constructor.name}.css`
+            css
         );
 
         this.#render();
