@@ -86,8 +86,6 @@ export class FluxColorScheme {
      * @returns {Promise<void>}
      */
     async init() {
-        await this.#getSystemColorSchemeDetector();
-
         await this.#flux_localization_api.addModule(
             `${__dirname}/Localization`,
             COLOR_SCHEME_LOCALIZATION_MODULE
