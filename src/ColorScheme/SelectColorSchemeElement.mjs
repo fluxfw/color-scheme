@@ -9,10 +9,16 @@ import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from "./COLOR_SCHEME.mjs";
 /** @typedef {import("./setColorScheme.mjs").setColorScheme} setColorScheme */
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
-const __dirname = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"));
+flux_css_api.adopt(
+    document,
+    await flux_css_api.import(
+        `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/SelectColorSchemeVariables.css`
+    ),
+    true
+);
 
 const css = await flux_css_api.import(
-    `${__dirname}/SelectColorSchemeElement.css`
+    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/SelectColorSchemeElement.css`
 );
 
 export class SelectColorSchemeElement extends HTMLElement {

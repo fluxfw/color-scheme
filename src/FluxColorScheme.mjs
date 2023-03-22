@@ -12,19 +12,12 @@ import { VARIABLE_ACCENT, VARIABLE_ACCENT_FOREGROUND, VARIABLE_ACCENT_FOREGROUND
 /** @typedef {import("./ColorScheme/SelectColorSchemeElement.mjs").SelectColorSchemeElement} SelectColorSchemeElement */
 /** @typedef {import("./ColorScheme/SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
-const __dirname = import.meta.url.substring(0, import.meta.url.lastIndexOf("/"));
-
 flux_css_api.adopt(
     document,
     await flux_css_api.import(
-        `${__dirname}/ColorScheme/ColorSchemeVariables.css`
-    )
-);
-flux_css_api.adopt(
-    document,
-    await flux_css_api.import(
-        `${__dirname}/ColorScheme/SelectColorSchemeVariables.css`
-    )
+        `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/ColorScheme/ColorSchemeVariables.css`
+    ),
+    true
 );
 
 export class FluxColorScheme {
@@ -87,7 +80,7 @@ export class FluxColorScheme {
         this.#additional_variables = additional_variables;
 
         this.#flux_localization_api.addModule(
-            `${__dirname}/Localization`,
+            `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/Localization`,
             COLOR_SCHEME_LOCALIZATION_MODULE
         );
 
@@ -219,13 +212,13 @@ export class FluxColorScheme {
     }
 
     /**
-     * @param {boolean} only_if_system_color_scheme
+     * @param {boolean | null} only_if_system_color_scheme
      * @returns {Promise<void>}
      */
-    async renderColorScheme(only_if_system_color_scheme = false) {
+    async renderColorScheme(only_if_system_color_scheme = null) {
         const color_scheme = await this.getColorScheme();
 
-        if (only_if_system_color_scheme && !color_scheme.system_color_scheme) {
+        if ((only_if_system_color_scheme ?? false) && !color_scheme.system_color_scheme) {
             return;
         }
 
@@ -269,10 +262,10 @@ export class FluxColorScheme {
     }
 
     /**
-     * @param {boolean} only_default
+     * @param {boolean | null} only_default
      * @returns {Promise<string[]>}
      */
-    async #getVariables(only_default = false) {
+    async #getVariables(only_default = null) {
         return Array.from(new Set([
             VARIABLE_ACCENT,
             VARIABLE_ACCENT_FOREGROUND,
@@ -282,7 +275,7 @@ export class FluxColorScheme {
             VARIABLE_BACKGROUND_RGB,
             VARIABLE_FOREGROUND,
             VARIABLE_FOREGROUND_RGB,
-            ...(!only_default ? this.#additional_variables : null) ?? []
+            ...(!(only_default ?? false) ? this.#additional_variables : null) ?? []
         ]));
     }
 
