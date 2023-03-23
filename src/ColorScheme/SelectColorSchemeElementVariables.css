@@ -1,0 +1,3 @@
+:root {
+    --flux-select-color-scheme-title-color: var(--flux-color-scheme-foreground, #000000);
+}

@@ -12,7 +12,7 @@ import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from "./COLOR_SCHEME.mjs";
 flux_css_api.adopt(
     document,
     await flux_css_api.import(
-        `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/SelectColorSchemeVariables.css`
+        `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/SelectColorSchemeElementVariables.css`
     ),
     true
 );
@@ -90,7 +90,10 @@ export class SelectColorSchemeElement extends HTMLElement {
         this.#variables = variables;
         this.#system_color_schemes = system_color_schemes;
 
-        this.#shadow = this.attachShadow({ mode: "closed" });
+        this.#shadow = this.attachShadow({
+            mode: "closed"
+        });
+
         flux_css_api.adopt(
             this.#shadow,
             css
