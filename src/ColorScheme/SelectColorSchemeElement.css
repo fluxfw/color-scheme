@@ -25,6 +25,7 @@
     background-color: var(--flux-select-color-scheme-color-scheme-color);
     border: 3px solid #888888;
     border-radius: 45px;
+    cursor: default;
     flex-grow: 0;
     flex-shrink: 0;
     height: 45px;
