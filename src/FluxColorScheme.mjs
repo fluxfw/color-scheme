@@ -30,11 +30,11 @@ export class FluxColorScheme {
      */
     #color_schemes;
     /**
-     * @type {FluxLocalizationApi}
+     * @type {FluxLocalizationApi | null}
      */
     #flux_localization_api;
     /**
-     * @type {FluxSettingsApi}
+     * @type {FluxSettingsApi | null}
      */
     #flux_settings_api;
     /**
@@ -48,13 +48,13 @@ export class FluxColorScheme {
 
     /**
      * @param {ColorScheme[]} color_schemes
-     * @param {FluxLocalizationApi} flux_localization_api
-     * @param {FluxSettingsApi} flux_settings_api
+     * @param {FluxLocalizationApi | null} flux_localization_api
+     * @param {FluxSettingsApi | null} flux_settings_api
      * @param {SystemColorScheme | null} system_color_schemes
      * @param {string[] | null} additional_variables
      * @returns {FluxColorScheme}
      */
-    static new(color_schemes, flux_localization_api, flux_settings_api, system_color_schemes = null, additional_variables = null) {
+    static new(color_schemes, flux_localization_api = null, flux_settings_api = null, system_color_schemes = null, additional_variables = null) {
         return new this(
             color_schemes,
             flux_localization_api,
@@ -66,8 +66,8 @@ export class FluxColorScheme {
 
     /**
      * @param {ColorScheme[]} color_schemes
-     * @param {FluxLocalizationApi} flux_localization_api
-     * @param {FluxSettingsApi} flux_settings_api
+     * @param {FluxLocalizationApi | null} flux_localization_api
+     * @param {FluxSettingsApi | null} flux_settings_api
      * @param {SystemColorScheme | null} system_color_schemes
      * @param {string[] | null} additional_variables
      * @private
@@ -79,10 +79,12 @@ export class FluxColorScheme {
         this.#system_color_schemes = system_color_schemes;
         this.#additional_variables = additional_variables;
 
-        this.#flux_localization_api.addModule(
-            `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/Localization`,
-            COLOR_SCHEME_LOCALIZATION_MODULE
-        );
+        if (this.#flux_localization_api !== null) {
+            this.#flux_localization_api.addModule(
+                `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/Localization`,
+                COLOR_SCHEME_LOCALIZATION_MODULE
+            );
+        }
 
         this.renderColorScheme();
     }
@@ -145,10 +147,9 @@ export class FluxColorScheme {
      * @returns {Promise<ColorSchemeWithSystemColorScheme>}
      */
     async getColorScheme() {
-        let color_scheme_name = await this.#flux_settings_api.get(
-            COLOR_SCHEME_SETTINGS_KEY,
-            ""
-        );
+        let color_scheme_name = await this.#flux_settings_api?.get(
+            COLOR_SCHEME_SETTINGS_KEY
+        ) ?? "";
 
         const system_color_scheme = this.#system_color_schemes !== null && color_scheme_name === "";
         if (system_color_scheme) {
@@ -187,6 +188,10 @@ export class FluxColorScheme {
      * @returns {Promise<SelectColorSchemeElement>}
      */
     async getSelectColorSchemeElement() {
+        if (this.#flux_localization_api === null) {
+            throw new Error("Missing FluxLocalizationApi");
+        }
+
         return (await import("./ColorScheme/SelectColorSchemeElement.mjs")).SelectColorSchemeElement.new(
             await this.getColorScheme(),
             this.#color_schemes,
@@ -284,6 +289,10 @@ export class FluxColorScheme {
      * @returns {Promise<void>}
      */
     async #setColorScheme(color_scheme_name) {
+        if (this.#flux_settings_api === null) {
+            throw new Error("Missing FluxSettingsApi");
+        }
+
         await this.#flux_settings_api.store(
             COLOR_SCHEME_SETTINGS_KEY,
             color_scheme_name
