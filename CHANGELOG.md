@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-05-30-1
+
+Changes:
+
+- Natvie `adoptedStyleSheets`
+
 ## v2023-04-24-1
 
 Changes:
