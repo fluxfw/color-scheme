@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-06-02-1
+
+Changes:
+
+- Set variables to `CSSStyleRule`
+
 ## v2023-05-30-1
 
 Changes:

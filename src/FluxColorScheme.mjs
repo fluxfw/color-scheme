@@ -43,6 +43,10 @@ export class FluxColorScheme {
      * @type {SystemColorScheme | null}
      */
     #system_color_schemes;
+    /**
+     * @type {CSSStyleRule | null}
+     */
+    #variables_style_sheet_rule = null;
 
     /**
      * @param {ColorScheme[]} color_schemes
@@ -225,11 +229,12 @@ export class FluxColorScheme {
             return;
         }
 
-        for (const key of Array.from(document.documentElement.style).filter(_key => _key.startsWith(COLOR_SCHEME_CSS_PROPERTY_PREFIX))) {
-            document.documentElement.style.removeProperty(key);
+        const variables_style_sheet_rule = await this.#getVariablesStyleSheetRule();
+        for (const key of Array.from(variables_style_sheet_rule.style).filter(_key => _key.startsWith(COLOR_SCHEME_CSS_PROPERTY_PREFIX))) {
+            variables_style_sheet_rule.style.removeProperty(key);
         }
         for (const variable of await this.#getVariables()) {
-            document.documentElement.style.setProperty(`${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${variable}`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${color_scheme.name}-${variable})`);
+            variables_style_sheet_rule.style.setProperty(`${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${variable}`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${color_scheme.name}-${variable})`);
         }
 
         const color_scheme_meta = document.head.querySelector("meta[name=color-scheme]") ?? document.createElement("meta");
@@ -280,6 +285,22 @@ export class FluxColorScheme {
             VARIABLE_FOREGROUND_RGB,
             ...(!(only_default ?? false) ? this.#additional_variables : null) ?? []
         ]));
+    }
+
+    /**
+     * @returns {Promise<CSSStyleRule>}
+     */
+    async #getVariablesStyleSheetRule() {
+        if (this.#variables_style_sheet_rule === null) {
+            const style_sheet = new CSSStyleSheet();
+            await style_sheet.replace(":root { }");
+            [
+                this.#variables_style_sheet_rule
+            ] = style_sheet.cssRules;
+            document.adoptedStyleSheets.push(style_sheet);
+        }
+
+        return this.#variables_style_sheet_rule;
     }
 
     /**
