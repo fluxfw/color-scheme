@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-06-05-1
+
+Changes:
+
+- Fix Chromium based browsers crash (SIGSEGV)
+
 ## v2023-06-02-1
 
 Changes:

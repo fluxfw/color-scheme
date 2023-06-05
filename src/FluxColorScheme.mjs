@@ -291,6 +291,14 @@ export class FluxColorScheme {
      * @returns {Promise<CSSStyleRule>}
      */
     async #getVariablesStyleSheetRule() {
+        if (this.#variables_style_sheet_rule !== null) {
+            const index = document.adoptedStyleSheets.indexOf(this.#variables_style_sheet_rule);
+            if (index !== -1) {
+                document.adoptedStyleSheets.splice(index, 1);
+            }
+            this.#variables_style_sheet_rule = null;
+        }
+
         if (this.#variables_style_sheet_rule === null) {
             const style_sheet = new CSSStyleSheet();
             await style_sheet.replace(":root { }");
