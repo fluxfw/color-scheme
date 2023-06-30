@@ -31,12 +31,14 @@ export const DEFAULT_SYSTEM_COLOR_SCHEMES = Object.freeze([
         "default-color-scheme": COLOR_SCHEME_LIGHT,
         detector: matchMedia(`(prefers-color-scheme: ${COLOR_SCHEME_LIGHT})`),
         label: "Light",
-        name: COLOR_SCHEME_LIGHT
+        name: COLOR_SCHEME_LIGHT,
+        "use-in-color-scheme": true
     },
     {
         "default-color-scheme": COLOR_SCHEME_DARK,
         detector: matchMedia(`(prefers-color-scheme: ${COLOR_SCHEME_DARK})`),
         label: "Dark",
-        name: COLOR_SCHEME_DARK
+        name: COLOR_SCHEME_DARK,
+        "use-in-color-scheme": true
     }
 ]);

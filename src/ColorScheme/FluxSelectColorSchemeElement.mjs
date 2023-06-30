@@ -30,24 +30,30 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
     /**
      * @type {boolean}
      */
+    #set_system_color_schemes;
+    /**
+     * @type {boolean}
+     */
     #show_color_scheme_accent_color;
     /**
-     * @type {SystemColorScheme[] | null}
+     * @type {SystemColorScheme[]}
      */
     #system_color_schemes;
 
     /**
      * @param {ColorScheme[]} color_schemes
-     * @param {SystemColorScheme[] | null} system_color_schemes
+     * @param {SystemColorScheme[]} system_color_schemes
+     * @param {boolean} set_system_color_schemes
+     * @param {boolean} show_color_scheme_accent_color
      * @param {[ColorScheme, {[key: string]: ColorScheme}]} settings
      * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} setSettings
-     * @param {boolean} show_color_scheme_accent_color
      * @param {FluxLocalizationApi} flux_localization_api
      * @returns {Promise<FluxSelectColorSchemeElement>}
      */
-    static async new(color_schemes, system_color_schemes, settings, setSettings, show_color_scheme_accent_color, flux_localization_api) {
+    static async new(color_schemes, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, settings, setSettings, flux_localization_api) {
         const flux_select_color_scheme_element = new this(
             system_color_schemes,
+            set_system_color_schemes,
             show_color_scheme_accent_color,
             flux_localization_api
         );
@@ -76,15 +82,17 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
     }
 
     /**
-     * @param {SystemColorScheme[] | null} system_color_schemes
+     * @param {SystemColorScheme[]} system_color_schemes
+     * @param {boolean} set_system_color_schemes
      * @param {boolean} show_color_scheme_accent_color
      * @param {FluxLocalizationApi} flux_localization_api
      * @private
      */
-    constructor(system_color_schemes, show_color_scheme_accent_color, flux_localization_api) {
+    constructor(system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, flux_localization_api) {
         super();
 
         this.#system_color_schemes = system_color_schemes;
+        this.#set_system_color_schemes = set_system_color_schemes;
         this.#show_color_scheme_accent_color = show_color_scheme_accent_color;
         this.#flux_localization_api = flux_localization_api;
 
@@ -104,6 +112,11 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
      * @returns {Promise<void>}
      */
     async #render(parent_element, color_schemes, settings, setColorScheme, setSettings) {
+        const variables = [
+            COLOR_SCHEME_VARIABLE_BACKGROUND,
+            COLOR_SCHEME_VARIABLE_FOREGROUND
+        ];
+
         for (const color_scheme of color_schemes) {
             const color_scheme_element = document.createElement("button");
             color_scheme_element.classList.add("color_scheme");
@@ -118,13 +131,27 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
 
             if (color_scheme.name === COLOR_SCHEME_SYSTEM) {
                 color_scheme_element.dataset.system = true;
+
+                const use_in_color_schemes = this.#system_color_schemes.filter(system_color_scheme => system_color_scheme["use-in-color-scheme"]);
+
+                const values = {
+                    [COLOR_SCHEME_VARIABLE_BACKGROUND]: use_in_color_schemes.shift()?.["default-color-scheme"] ?? null,
+                    [COLOR_SCHEME_VARIABLE_FOREGROUND]: use_in_color_schemes.shift()?.["default-color-scheme"] ?? null
+                };
+
+                for (const variable of variables) {
+                    if (values[variable] === null) {
+                        continue;
+                    }
+
+                    color_scheme_element.style.setProperty(`--flux-select-color-scheme-color-scheme-${variable}-color`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${values[variable]}-${COLOR_SCHEME_VARIABLE_BACKGROUND})`);
+                }
             } else {
                 for (const variable of [
                     ...this.#show_color_scheme_accent_color ? [
                         COLOR_SCHEME_VARIABLE_ACCENT
                     ] : [],
-                    COLOR_SCHEME_VARIABLE_BACKGROUND,
-                    COLOR_SCHEME_VARIABLE_FOREGROUND
+                    ...variables
                 ]) {
                     color_scheme_element.style.setProperty(`--flux-select-color-scheme-color-scheme-${variable}-color`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${color_scheme.name}-${variable})`);
                 }
@@ -172,7 +199,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
      * @returns {Promise<void>}
      */
     async #updateSystemColorSchemeSelector(parent_element, color_schemes, settings, setSettings) {
-        if (this.#system_color_schemes === null) {
+        if (!this.#set_system_color_schemes) {
             return;
         }
 

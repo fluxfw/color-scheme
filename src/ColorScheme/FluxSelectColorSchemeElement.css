@@ -89,15 +89,24 @@
     transform: translate(-50%, -50%);
 }
 
-.color_scheme[data-system]::before {
-    bottom: 0;
-    right: 0;
-    top: 0;
-    width: 50%;
+.color_scheme[data-system]:not([data-selected])::before {
+    border-end-end-radius: 45px;
+    border-start-end-radius: 45px;
+    bottom: 3px;
+    right: 3px;
+    top: 3px;
+    width: calc(50% - 3px);
 }
 
 .color_scheme[data-selected] {
     border-color: rgb(var(--flux-select-color-scheme-color-scheme-border-color-rgb));
     border-width: 4px;
     padding: 0;
+}
+
+.color_scheme[data-system][data-selected]::before {
+    bottom: 0;
+    right: 0;
+    top: 0;
+    width: 50%;
 }

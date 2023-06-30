@@ -240,14 +240,15 @@ export class FluxColorScheme {
 
         return (await import("./ColorScheme/FluxSelectColorSchemeElement.mjs")).FluxSelectColorSchemeElement.new(
             this.#color_schemes,
-            this.#set_system_color_schemes ? this.#system_color_schemes : null,
+            this.#system_color_schemes,
+            this.#set_system_color_schemes,
+            this.#show_color_scheme_accent_color,
             await this.#getSettings(),
             async settings => {
                 await this.#setSettings(
                     settings
                 );
             },
-            this.#show_color_scheme_accent_color,
             this.#flux_localization_api
         );
     }
