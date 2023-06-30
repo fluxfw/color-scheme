@@ -6,6 +6,14 @@ Changes:
 
 \-
 
+## v2023-06-30-1
+
+Changes:
+
+- Any system color schemes
+- Set color scheme per system color scheme
+- Show color scheme's accent color
+
 ## v2023-06-05-1
 
 Changes:

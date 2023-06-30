@@ -1,4 +1,5 @@
 {
-    "Color scheme": "Farbschema",
-    "Use system color scheme ({light_color_scheme}/{dark_color_scheme})": "System-Farbschema benutzen ({light_color_scheme}/{dark_color_scheme})"
+    "Dark": "Dunkel",
+    "Light": "Hell",
+    "System based": "Systembasiert"
 }
