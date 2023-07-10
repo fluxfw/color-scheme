@@ -1,9 +1,8 @@
-import { COLOR_SCHEME_CSS_PROPERTY_PREFIX } from "./ColorScheme/COLOR_SCHEME_CSS_PROPERTY_PREFIX.mjs";
 import { COLOR_SCHEME_LOCALIZATION_MODULE } from "./Localization/_LOCALIZATION_MODULE.mjs";
+import { COLOR_SCHEME_SYSTEM } from "./ColorScheme/COLOR_SCHEME.mjs";
 import { flux_css_api } from "../../flux-css-api/src/FluxCssApi.mjs";
-import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_SYSTEM } from "./ColorScheme/COLOR_SCHEME.mjs";
 import { COLOR_SCHEME_SETTINGS_KEY, COLOR_SCHEME_SYSTEM_SETTINGS_KEY } from "./Settings/COLOR_SCHEME_SETTINGS_KEY.mjs";
-import { COLOR_SCHEME_VARIABLE_ACCENT, COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND, COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND_RGB, COLOR_SCHEME_VARIABLE_ACCENT_RGB, COLOR_SCHEME_VARIABLE_BACKGROUND, COLOR_SCHEME_VARIABLE_BACKGROUND_RGB, COLOR_SCHEME_VARIABLE_FOREGROUND, COLOR_SCHEME_VARIABLE_FOREGROUND_RGB } from "./ColorScheme/COLOR_SCHEME_VARIABLE.mjs";
+import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_RGB, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_COLOR_SCHEME, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_PREFIX, COLOR_SCHEME_VARIABLE_RGB_SUFFIX, DEFAULT_COLOR_SCHEME_VARIABLES } from "./ColorScheme/COLOR_SCHEME_VARIABLE.mjs";
 import { DEFAULT_COLOR_SCHEMES, DEFAULT_SYSTEM_COLOR_SCHEMES } from "./ColorScheme/DEFAULT_COLOR_SCHEMES.mjs";
 
 /** @typedef {import("./ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
@@ -13,17 +12,13 @@ import { DEFAULT_COLOR_SCHEMES, DEFAULT_SYSTEM_COLOR_SCHEMES } from "./ColorSche
 /** @typedef {import("../../flux-settings-api/src/FluxSettingsApi.mjs").FluxSettingsApi} FluxSettingsApi */
 /** @typedef {import("./ColorScheme/SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
-const variables_css = await flux_css_api.import(
-    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/ColorScheme/FluxColorSchemeVariables.css`
+const root_css = await flux_css_api.import(
+    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/ColorScheme/FluxColorSchemeRoot.css`
 );
 
-document.adoptedStyleSheets.unshift(variables_css);
+document.adoptedStyleSheets.unshift(root_css);
 
 export class FluxColorScheme {
-    /**
-     * @type {string[]}
-     */
-    #additional_variables;
     /**
      * @type {ColorScheme[]}
      */
@@ -45,9 +40,17 @@ export class FluxColorScheme {
      */
     #init_system_color_scheme_detectors = null;
     /**
+     * @type {Document | ShadowRoot}
+     */
+    #root;
+    /**
      * @type {boolean}
      */
     #set_system_color_schemes;
+    /**
+     * @type {string}
+     */
+    #settings_prefix;
     /**
      * @type {boolean}
      */
@@ -57,33 +60,41 @@ export class FluxColorScheme {
      */
     #system_color_schemes;
     /**
+     * @type {string[]}
+     */
+    #variables;
+    /**
      * @type {CSSStyleRule | null}
      */
-    #variables_style_sheet_rule = null;
+    #style_sheet_rule = null;
 
     /**
+     * @param {Document | ShadowRoot | null} root
      * @param {ColorScheme[] | null} color_schemes
      * @param {string | null} default_color_scheme
-     * @param {string[] | null} additional_variables
+     * @param {string[] | null} variables
      * @param {SystemColorScheme[] | null} system_color_schemes
      * @param {boolean | null} set_system_color_schemes
      * @param {boolean | null} show_color_scheme_accent_color
      * @param {FluxLocalizationApi | null} flux_localization_api
      * @param {FluxSettingsApi | null} flux_settings_api
+     * @param {string | null} settings_prefix
      * @returns {Promise<FluxColorScheme>}
      */
-    static async new(color_schemes, default_color_scheme = null, additional_variables = null, system_color_schemes = null, set_system_color_schemes = null, show_color_scheme_accent_color = null, flux_localization_api = null, flux_settings_api = null) {
+    static async new(root = null, color_schemes = null, default_color_scheme = null, variables = null, system_color_schemes = null, set_system_color_schemes = null, show_color_scheme_accent_color = null, flux_localization_api = null, flux_settings_api = null, settings_prefix = null) {
         const _color_schemes = color_schemes ?? DEFAULT_COLOR_SCHEMES;
 
         const flux_color_scheme = new this(
+            root ?? document,
             _color_schemes,
             default_color_scheme ?? (_color_schemes.some(color_scheme => color_scheme.name === COLOR_SCHEME_SYSTEM) ? null : _color_schemes[0]?.name ?? null) ?? COLOR_SCHEME_SYSTEM,
-            additional_variables ?? [],
+            variables ?? DEFAULT_COLOR_SCHEME_VARIABLES,
             system_color_schemes ?? DEFAULT_SYSTEM_COLOR_SCHEMES,
             set_system_color_schemes ?? false,
             show_color_scheme_accent_color ?? false,
             flux_localization_api,
-            flux_settings_api
+            flux_settings_api,
+            settings_prefix ?? ""
         );
 
         await flux_color_scheme.#render();
@@ -92,25 +103,33 @@ export class FluxColorScheme {
     }
 
     /**
+     * @param {Document | ShadowRoot} root
      * @param {ColorScheme[]} color_schemes
      * @param {string} default_color_scheme
-     * @param {string[]} additional_variables
+     * @param {string[]} variables
      * @param {SystemColorScheme[]} system_color_schemes
      * @param {boolean} set_system_color_schemes
      * @param {boolean} show_color_scheme_accent_color
      * @param {FluxLocalizationApi | null} flux_localization_api
      * @param {FluxSettingsApi | null} flux_settings_api
+     * @param {string} settings_prefix
      * @private
      */
-    constructor(color_schemes, default_color_scheme, additional_variables, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, flux_localization_api, flux_settings_api) {
+    constructor(root, color_schemes, default_color_scheme, variables, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, flux_localization_api, flux_settings_api, settings_prefix) {
+        this.#root = root;
         this.#color_schemes = color_schemes;
         this.#default_color_scheme = default_color_scheme;
-        this.#additional_variables = additional_variables;
+        this.#variables = variables;
         this.#system_color_schemes = system_color_schemes;
         this.#set_system_color_schemes = set_system_color_schemes;
         this.#show_color_scheme_accent_color = show_color_scheme_accent_color;
         this.#flux_localization_api = flux_localization_api;
         this.#flux_settings_api = flux_settings_api;
+        this.#settings_prefix = settings_prefix;
+
+        if (this.#root !== document) {
+            this.#root.adoptedStyleSheets.unshift(root_css);
+        }
 
         if (this.#flux_localization_api !== null) {
             this.#flux_localization_api.addModule(
@@ -123,54 +142,54 @@ export class FluxColorScheme {
     /**
      * @returns {Promise<string>}
      */
-    async getAccent() {
+    async getAccentColorForegroundColorRgbVariable() {
         return this.getVariable(
-            COLOR_SCHEME_VARIABLE_ACCENT
+            COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR_RGB
         );
     }
 
     /**
      * @returns {Promise<string>}
      */
-    async getAccentForeground() {
+    async getAccentColorForegroundColorVariable() {
         return this.getVariable(
-            COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND
+            COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR
         );
     }
 
     /**
      * @returns {Promise<string>}
      */
-    async getAccentForegroundRgb() {
+    async getAccentColorRgbVariable() {
         return this.getVariable(
-            COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND_RGB
+            COLOR_SCHEME_VARIABLE_ACCENT_COLOR_RGB
         );
     }
 
     /**
      * @returns {Promise<string>}
      */
-    async getAccentRgb() {
+    async getAccentColorVariable() {
         return this.getVariable(
-            COLOR_SCHEME_VARIABLE_ACCENT_RGB
+            COLOR_SCHEME_VARIABLE_ACCENT_COLOR
         );
     }
 
     /**
      * @returns {Promise<string>}
      */
-    async getBackground() {
+    async getBackgroundColorRgbVariable() {
         return this.getVariable(
-            COLOR_SCHEME_VARIABLE_BACKGROUND
+            COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR_RGB
         );
     }
 
     /**
      * @returns {Promise<string>}
      */
-    async getBackgroundRgb() {
+    async getBackgroundColorVariable() {
         return this.getVariable(
-            COLOR_SCHEME_VARIABLE_BACKGROUND_RGB
+            COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR
         );
     }
 
@@ -208,25 +227,34 @@ export class FluxColorScheme {
 
         return {
             ..._color_scheme,
-            system_color_scheme
+            "system-color-scheme": system_color_scheme
         };
     }
 
     /**
      * @returns {Promise<string>}
      */
-    async getForeground() {
+    async getColorSchemeVariable() {
         return this.getVariable(
-            COLOR_SCHEME_VARIABLE_FOREGROUND
+            COLOR_SCHEME_VARIABLE_COLOR_SCHEME
         );
     }
 
     /**
      * @returns {Promise<string>}
      */
-    async getForegroundRgb() {
+    async getForegroundColorRgbVariable() {
         return this.getVariable(
-            COLOR_SCHEME_VARIABLE_FOREGROUND_RGB
+            COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR_RGB
+        );
+    }
+
+    /**
+     * @returns {Promise<string>}
+     */
+    async getForegroundColorVariable() {
+        return this.getVariable(
+            COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR
         );
     }
 
@@ -258,7 +286,7 @@ export class FluxColorScheme {
      * @returns {Promise<string>}
      */
     async getVariable(variable) {
-        return getComputedStyle(document.documentElement).getPropertyValue(`${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${variable}`).trim();
+        return getComputedStyle(this.#root instanceof Document ? this.#root.documentElement : this.#root.host).getPropertyValue(`${COLOR_SCHEME_VARIABLE_PREFIX}${variable}`).trim();
     }
 
     /**
@@ -283,7 +311,7 @@ export class FluxColorScheme {
         let color_scheme = null;
 
         const name = await this.#flux_settings_api?.get(
-            COLOR_SCHEME_SETTINGS_KEY
+            `${this.#settings_prefix}${COLOR_SCHEME_SETTINGS_KEY}`
         ) ?? null;
 
         if (name !== null) {
@@ -303,7 +331,7 @@ export class FluxColorScheme {
         }
 
         const system = this.#set_system_color_schemes ? await this.#flux_settings_api?.get(
-            COLOR_SCHEME_SYSTEM_SETTINGS_KEY
+            `${this.#settings_prefix}${COLOR_SCHEME_SYSTEM_SETTINGS_KEY}`
         ) ?? null : null;
 
         return [
@@ -342,44 +370,27 @@ export class FluxColorScheme {
     }
 
     /**
-     * @returns {Promise<string[]>}
-     */
-    async #getVariables() {
-        return Array.from(new Set([
-            COLOR_SCHEME_VARIABLE_ACCENT,
-            COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND,
-            COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND_RGB,
-            COLOR_SCHEME_VARIABLE_ACCENT_RGB,
-            COLOR_SCHEME_VARIABLE_BACKGROUND,
-            COLOR_SCHEME_VARIABLE_BACKGROUND_RGB,
-            COLOR_SCHEME_VARIABLE_FOREGROUND,
-            COLOR_SCHEME_VARIABLE_FOREGROUND_RGB,
-            ...this.#additional_variables
-        ]));
-    }
-
-    /**
      * @returns {Promise<CSSStyleRule>}
      */
-    async #getVariablesStyleSheetRule() {
-        if (this.#variables_style_sheet_rule !== null) {
-            const index = document.adoptedStyleSheets.indexOf(this.#variables_style_sheet_rule);
+    async #getStyleSheetRule() {
+        if (this.#style_sheet_rule !== null) {
+            const index = this.#root.adoptedStyleSheets.indexOf(this.#style_sheet_rule.parentStyleSheet);
             if (index !== -1) {
-                document.adoptedStyleSheets.splice(index, 1);
+                this.#root.adoptedStyleSheets.splice(index, 1);
             }
-            this.#variables_style_sheet_rule = null;
+            this.#style_sheet_rule = null;
         }
 
-        if (this.#variables_style_sheet_rule === null) {
+        if (this.#style_sheet_rule === null) {
             const style_sheet = new CSSStyleSheet();
-            await style_sheet.replace(":root { }");
+            await style_sheet.replace(`:${this.#root instanceof Document ? "root" : "host"} { }`);
             [
-                this.#variables_style_sheet_rule
+                this.#style_sheet_rule
             ] = style_sheet.cssRules;
-            document.adoptedStyleSheets.push(style_sheet);
+            this.#root.adoptedStyleSheets.push(style_sheet);
         }
 
-        return this.#variables_style_sheet_rule;
+        return this.#style_sheet_rule;
     }
 
     /**
@@ -418,26 +429,35 @@ export class FluxColorScheme {
     async #render() {
         const color_scheme = await this.getColorScheme();
 
-        const variables_style_sheet_rule = await this.#getVariablesStyleSheetRule();
-        for (const key of Array.from(variables_style_sheet_rule.style).filter(_key => _key.startsWith(COLOR_SCHEME_CSS_PROPERTY_PREFIX))) {
-            variables_style_sheet_rule.style.removeProperty(key);
-        }
-        for (const variable of await this.#getVariables()) {
-            variables_style_sheet_rule.style.setProperty(`${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${variable}`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${color_scheme.name}-${variable})`);
+        const style_sheet_rule = await this.#getStyleSheetRule();
+
+        for (const key of Array.from(style_sheet_rule.style).filter(_key => _key.startsWith(COLOR_SCHEME_VARIABLE_PREFIX))) {
+            style_sheet_rule.style.removeProperty(key);
         }
 
-        const color_scheme_meta_element = document.head.querySelector("meta[name=color-scheme]") ?? document.createElement("meta");
-        color_scheme_meta_element.content = color_scheme["color-scheme"] ?? COLOR_SCHEME_LIGHT;
-        color_scheme_meta_element.name = "color-scheme";
-        if (!color_scheme_meta_element.isConnected) {
-            document.head.appendChild(color_scheme_meta_element);
+        for (const variable of this.#variables) {
+            if (variable.endsWith(COLOR_SCHEME_VARIABLE_RGB_SUFFIX)) {
+                const _variable = variable.substring(0, variable.length - COLOR_SCHEME_VARIABLE_RGB_SUFFIX.length);
+
+                if (!this.#variables.includes(_variable)) {
+                    for (const _color_scheme of this.#color_schemes.filter(__color_scheme => __color_scheme.name !== COLOR_SCHEME_SYSTEM)) {
+                        style_sheet_rule.style.setProperty(`${COLOR_SCHEME_VARIABLE_PREFIX}${_color_scheme.name}-${_variable}`, `rgb(var(${COLOR_SCHEME_VARIABLE_PREFIX}${_color_scheme.name}-${variable}))`);
+                    }
+
+                    style_sheet_rule.style.setProperty(`${COLOR_SCHEME_VARIABLE_PREFIX}${_variable}`, `var(${COLOR_SCHEME_VARIABLE_PREFIX}${color_scheme.name}-${_variable})`);
+                }
+            }
+
+            style_sheet_rule.style.setProperty(`${COLOR_SCHEME_VARIABLE_PREFIX}${variable}`, `var(${COLOR_SCHEME_VARIABLE_PREFIX}${color_scheme.name}-${variable})`);
         }
 
-        const theme_color_meta_element = document.head.querySelector("meta[name=theme-color]") ?? document.createElement("meta");
-        theme_color_meta_element.content = await this.getAccent();
-        theme_color_meta_element.name = "theme-color";
-        if (!theme_color_meta_element.isConnected) {
-            document.head.appendChild(theme_color_meta_element);
+        if (this.#root instanceof Document) {
+            const theme_color_meta_element = this.#root.head.querySelector("meta[name=theme-color]") ?? this.#root.createElement("meta");
+            theme_color_meta_element.content = await this.getAccentColorVariable();
+            theme_color_meta_element.name = "theme-color";
+            if (!theme_color_meta_element.isConnected) {
+                this.#root.head.append(theme_color_meta_element);
+            }
         }
     }
 
@@ -451,13 +471,13 @@ export class FluxColorScheme {
         }
 
         await this.#flux_settings_api.store(
-            COLOR_SCHEME_SETTINGS_KEY,
+            `${this.#settings_prefix}${COLOR_SCHEME_SETTINGS_KEY}`,
             settings[0].name
         );
 
         if (this.#set_system_color_schemes) {
             await this.#flux_settings_api.store(
-                COLOR_SCHEME_SYSTEM_SETTINGS_KEY,
+                `${this.#settings_prefix}${COLOR_SCHEME_SYSTEM_SETTINGS_KEY}`,
                 Object.fromEntries(Object.entries(settings[1]).map(([
                     name,
                     color_scheme
@@ -468,7 +488,7 @@ export class FluxColorScheme {
             );
         } else {
             await this.#flux_settings_api.delete(
-                COLOR_SCHEME_SYSTEM_SETTINGS_KEY
+                `${this.#settings_prefix}${COLOR_SCHEME_SYSTEM_SETTINGS_KEY}`
             );
         }
 

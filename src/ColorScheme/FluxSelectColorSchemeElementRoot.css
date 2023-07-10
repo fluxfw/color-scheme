@@ -1,0 +1,6 @@
+:root {
+    --flux-select-color-scheme-background-color: var(--flux-color-scheme-background-color, #ffffff);
+    --flux-select-color-scheme-color-scheme-border-color-rgb: 128, 128, 128;
+    --flux-select-color-scheme-color-scheme-outline-color: var(--flux-color-scheme-foreground-color, #000000);
+    --flux-select-color-scheme-foreground-color: var(--flux-color-scheme-foreground-color, #000000);
+}

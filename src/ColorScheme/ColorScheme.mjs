@@ -1,3 +1,5 @@
+/** @typedef {import("../../../flux-localization-api/src/FluxLocalizationApi.mjs").FluxLocalizationApi} FluxLocalizationApi */
+
 /**
- * @typedef {{"color-scheme"?: string | null, label: string, name: string}} ColorScheme
+ * @typedef {{getLabel: (flux_localization_api: FluxLocalizationApi) => Promise<string>, name: string}} ColorScheme
  */

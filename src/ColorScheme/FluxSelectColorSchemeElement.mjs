@@ -1,18 +1,16 @@
-import { COLOR_SCHEME_CSS_PROPERTY_PREFIX } from "./COLOR_SCHEME_CSS_PROPERTY_PREFIX.mjs";
-import { COLOR_SCHEME_LOCALIZATION_MODULE } from "../Localization/_LOCALIZATION_MODULE.mjs";
 import { COLOR_SCHEME_SYSTEM } from "./COLOR_SCHEME.mjs";
 import { flux_css_api } from "../../../flux-css-api/src/FluxCssApi.mjs";
-import { COLOR_SCHEME_VARIABLE_ACCENT, COLOR_SCHEME_VARIABLE_BACKGROUND, COLOR_SCHEME_VARIABLE_FOREGROUND } from "./COLOR_SCHEME_VARIABLE.mjs";
+import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_PREFIX } from "./COLOR_SCHEME_VARIABLE.mjs";
 
 /** @typedef {import("./ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("../../../flux-localization-api/src/FluxLocalizationApi.mjs").FluxLocalizationApi} FluxLocalizationApi */
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
-const variables_css = await flux_css_api.import(
-    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxSelectColorSchemeElementVariables.css`
+const root_css = await flux_css_api.import(
+    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxSelectColorSchemeElementRoot.css`
 );
 
-document.adoptedStyleSheets.unshift(variables_css);
+document.adoptedStyleSheets.unshift(root_css);
 
 const css = await flux_css_api.import(
     `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxSelectColorSchemeElement.css`
@@ -76,7 +74,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             },
             setSettings
         );
-        flux_select_color_scheme_element.#shadow.appendChild(color_schemes_element);
+        flux_select_color_scheme_element.#shadow.append(color_schemes_element);
 
         return flux_select_color_scheme_element;
     }
@@ -113,8 +111,8 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
      */
     async #render(parent_element, color_schemes, settings, setColorScheme, setSettings) {
         const variables = [
-            COLOR_SCHEME_VARIABLE_BACKGROUND,
-            COLOR_SCHEME_VARIABLE_FOREGROUND
+            COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR,
+            COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR
         ];
 
         for (const color_scheme of color_schemes) {
@@ -123,9 +121,8 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             if (color_scheme.name === settings[0].name) {
                 color_scheme_element.dataset.selected = true;
             }
-            color_scheme_element.title = await this.#flux_localization_api.translate(
-                color_scheme.label,
-                COLOR_SCHEME_LOCALIZATION_MODULE
+            color_scheme_element.title = await color_scheme.getLabel(
+                this.#flux_localization_api
             );
             color_scheme_element.type = "button";
 
@@ -135,8 +132,8 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                 const use_in_color_schemes = this.#system_color_schemes.filter(system_color_scheme => system_color_scheme["use-in-color-scheme"]);
 
                 const values = {
-                    [COLOR_SCHEME_VARIABLE_BACKGROUND]: use_in_color_schemes.shift()?.["default-color-scheme"] ?? null,
-                    [COLOR_SCHEME_VARIABLE_FOREGROUND]: use_in_color_schemes.shift()?.["default-color-scheme"] ?? null
+                    [COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR]: use_in_color_schemes.shift()?.["default-color-scheme"] ?? null,
+                    [COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR]: use_in_color_schemes.shift()?.["default-color-scheme"] ?? null
                 };
 
                 for (const variable of variables) {
@@ -144,16 +141,16 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                         continue;
                     }
 
-                    color_scheme_element.style.setProperty(`--flux-select-color-scheme-color-scheme-${variable}-color`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${values[variable]}-${COLOR_SCHEME_VARIABLE_BACKGROUND})`);
+                    color_scheme_element.style.setProperty(`--flux-select-color-scheme-color-scheme-${variable}`, `var(${COLOR_SCHEME_VARIABLE_PREFIX}${values[variable]}-${COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR})`);
                 }
             } else {
                 for (const variable of [
                     ...this.#show_color_scheme_accent_color ? [
-                        COLOR_SCHEME_VARIABLE_ACCENT
+                        COLOR_SCHEME_VARIABLE_ACCENT_COLOR
                     ] : [],
                     ...variables
                 ]) {
-                    color_scheme_element.style.setProperty(`--flux-select-color-scheme-color-scheme-${variable}-color`, `var(${COLOR_SCHEME_CSS_PROPERTY_PREFIX}${color_scheme.name}-${variable})`);
+                    color_scheme_element.style.setProperty(`--flux-select-color-scheme-color-scheme-${variable}`, `var(${COLOR_SCHEME_VARIABLE_PREFIX}${color_scheme.name}-${variable})`);
                 }
             }
 
@@ -180,7 +177,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                 );
             });
 
-            parent_element.appendChild(color_scheme_element);
+            parent_element.append(color_scheme_element);
         }
 
         await this.#updateSystemColorSchemeSelector(
@@ -215,11 +212,10 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             const title_element = document.createElement("div");
             title_element.classList.add("title");
             title_element.dataset.system_selector = true;
-            title_element.innerText = await this.#flux_localization_api.translate(
-                system_color_scheme.label,
-                COLOR_SCHEME_LOCALIZATION_MODULE
+            title_element.innerText = await system_color_scheme.getLabel(
+                this.#flux_localization_api
             );
-            parent_element.appendChild(title_element);
+            parent_element.append(title_element);
 
             const color_schemes_element = document.createElement("div");
             color_schemes_element.classList.add("color_schemes");
@@ -240,7 +236,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                 },
                 setSettings
             );
-            parent_element.appendChild(color_schemes_element);
+            parent_element.append(color_schemes_element);
         }
     }
 }

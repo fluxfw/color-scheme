@@ -1,0 +1,22 @@
+:root, :host {
+    --flux-color-scheme-dark-accent-color-foreground-color-rgb: 255, 255, 255;
+    --flux-color-scheme-dark-accent-color-rgb: 0, 0, 0;
+    --flux-color-scheme-dark-background-color-rgb: 0, 0, 0;
+    --flux-color-scheme-dark-color-scheme: dark;
+    --flux-color-scheme-dark-foreground-color-rgb: 255, 255, 255;
+    --flux-color-scheme-light-accent-color-foreground-color-rgb: 255, 255, 255;
+    --flux-color-scheme-light-accent-color-rgb: 0, 0, 0;
+    --flux-color-scheme-light-background-color-rgb: 255, 255, 255;
+    --flux-color-scheme-light-color-scheme: light;
+    --flux-color-scheme-light-foreground-color-rgb: 0, 0, 0;
+    -webkit-tap-highlight-color: rgba(var(--flux-color-scheme-accent-color-rgb, 0, 0, 0), 0.5);
+    accent-color: var(--flux-color-scheme-accent-color, #000000);
+    background-color: var(--flux-color-scheme-background-color, #ffffff);
+    color: var(--flux-color-scheme-foreground-color, #000000);
+    color-scheme: var(--flux-color-scheme-color-scheme, light);
+}
+
+::selection {
+    background-color: var(--flux-color-scheme-accent-color, #000000);
+    color: var(--flux-color-scheme-accent-color-foreground-color, #ffffff);
+}

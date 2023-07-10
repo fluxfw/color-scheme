@@ -2,5 +2,5 @@
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
 /**
- * @typedef {ColorScheme & {system_color_scheme: SystemColorScheme | null}} ColorSchemeWithSystemColorScheme
+ * @typedef {ColorScheme & {"system-color-scheme": SystemColorScheme | null}} ColorSchemeWithSystemColorScheme
  */
