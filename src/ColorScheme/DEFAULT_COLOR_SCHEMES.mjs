@@ -1,4 +1,4 @@
-import { COLOR_SCHEME_LOCALIZATION_MODULE } from "../Localization/_LOCALIZATION_MODULE.mjs";
+import { LOCALIZATION_MODULE_COLOR_SCHEME } from "../Localization/LOCALIZATION_MODULE.mjs";
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, COLOR_SCHEME_SYSTEM } from "./COLOR_SCHEME.mjs";
 
 /** @typedef {import("./ColorScheme.mjs").ColorScheme} ColorScheme */
@@ -9,23 +9,23 @@ import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, COLOR_SCHEME_SYSTEM } from "./CO
  */
 export const DEFAULT_COLOR_SCHEMES = Object.freeze([
     {
-        getLabel: async flux_localization_api => flux_localization_api.translate(
+        getLabel: async localization => localization.translate(
             "System based",
-            COLOR_SCHEME_LOCALIZATION_MODULE
+            LOCALIZATION_MODULE_COLOR_SCHEME
         ),
         name: COLOR_SCHEME_SYSTEM
     },
     {
-        getLabel: async flux_localization_api => flux_localization_api.translate(
+        getLabel: async localization => localization.translate(
             "Light",
-            COLOR_SCHEME_LOCALIZATION_MODULE
+            LOCALIZATION_MODULE_COLOR_SCHEME
         ),
         name: COLOR_SCHEME_LIGHT
     },
     {
-        getLabel: async flux_localization_api => flux_localization_api.translate(
+        getLabel: async localization => localization.translate(
             "Dark",
-            COLOR_SCHEME_LOCALIZATION_MODULE
+            LOCALIZATION_MODULE_COLOR_SCHEME
         ),
         name: COLOR_SCHEME_DARK
     }
@@ -38,9 +38,9 @@ export const DEFAULT_SYSTEM_COLOR_SCHEMES = Object.freeze([
     {
         "default-color-scheme": COLOR_SCHEME_LIGHT,
         detector: matchMedia(`(prefers-color-scheme: ${COLOR_SCHEME_LIGHT})`),
-        getLabel: async flux_localization_api => flux_localization_api.translate(
+        getLabel: async localization => localization.translate(
             "Light",
-            COLOR_SCHEME_LOCALIZATION_MODULE
+            LOCALIZATION_MODULE_COLOR_SCHEME
         ),
         name: COLOR_SCHEME_LIGHT,
         "use-in-color-scheme": true
@@ -48,9 +48,9 @@ export const DEFAULT_SYSTEM_COLOR_SCHEMES = Object.freeze([
     {
         "default-color-scheme": COLOR_SCHEME_DARK,
         detector: matchMedia(`(prefers-color-scheme: ${COLOR_SCHEME_DARK})`),
-        getLabel: async flux_localization_api => flux_localization_api.translate(
+        getLabel: async localization => localization.translate(
             "Dark",
-            COLOR_SCHEME_LOCALIZATION_MODULE
+            LOCALIZATION_MODULE_COLOR_SCHEME
         ),
         name: COLOR_SCHEME_DARK,
         "use-in-color-scheme": true

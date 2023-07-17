@@ -1,15 +1,15 @@
-import { COLOR_SCHEME_LOCALIZATION_MODULE } from "./Localization/_LOCALIZATION_MODULE.mjs";
 import { COLOR_SCHEME_SYSTEM } from "./ColorScheme/COLOR_SCHEME.mjs";
 import { flux_css_api } from "../../flux-css-api/src/FluxCssApi.mjs";
-import { COLOR_SCHEME_SETTINGS_KEY, COLOR_SCHEME_SYSTEM_SETTINGS_KEY } from "./Settings/COLOR_SCHEME_SETTINGS_KEY.mjs";
+import { LOCALIZATION_MODULE_COLOR_SCHEME } from "./Localization/LOCALIZATION_MODULE.mjs";
 import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_RGB, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_COLOR_SCHEME, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_PREFIX, COLOR_SCHEME_VARIABLE_RGB_SUFFIX, DEFAULT_COLOR_SCHEME_VARIABLES } from "./ColorScheme/COLOR_SCHEME_VARIABLE.mjs";
 import { DEFAULT_COLOR_SCHEMES, DEFAULT_SYSTEM_COLOR_SCHEMES } from "./ColorScheme/DEFAULT_COLOR_SCHEMES.mjs";
+import { SETTINGS_STORAGE_KEY_COLOR_SCHEME, SETTINGS_STORAGE_KEY_COLOR_SCHEME_SYSTEM } from "./SettingsStorage/SETTINGS_STORAGE_KEY.mjs";
 
 /** @typedef {import("./ColorScheme/ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("./ColorScheme/ColorSchemeWithSystemColorScheme.mjs").ColorSchemeWithSystemColorScheme} ColorSchemeWithSystemColorScheme */
-/** @typedef {import("../../flux-localization-api/src/FluxLocalizationApi.mjs").FluxLocalizationApi} FluxLocalizationApi */
 /** @typedef {import("./ColorScheme/FluxSelectColorSchemeElement.mjs").FluxSelectColorSchemeElement} FluxSelectColorSchemeElement */
-/** @typedef {import("../../flux-settings-api/src/FluxSettingsApi.mjs").FluxSettingsApi} FluxSettingsApi */
+/** @typedef {import("./Localization/Localization.mjs").Localization} Localization */
+/** @typedef {import("./SettingsStorage/SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./ColorScheme/SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
 const root_css = await flux_css_api.import(
@@ -28,17 +28,13 @@ export class FluxColorScheme {
      */
     #default_color_scheme;
     /**
-     * @type {FluxLocalizationApi | null}
-     */
-    #flux_localization_api;
-    /**
-     * @type {FluxSettingsApi | null}
-     */
-    #flux_settings_api;
-    /**
      * @type {() => {} | null}
      */
     #init_system_color_scheme_detectors = null;
+    /**
+     * @type {Localization | null}
+     */
+    #localization;
     /**
      * @type {Document | ShadowRoot}
      */
@@ -48,13 +44,17 @@ export class FluxColorScheme {
      */
     #set_system_color_schemes;
     /**
-     * @type {string}
+     * @type {SettingsStorage | null}
      */
-    #settings_prefix;
+    #settings_storage;
     /**
      * @type {boolean}
      */
     #show_color_scheme_accent_color;
+    /**
+     * @type {CSSStyleRule | null}
+     */
+    #style_sheet_rule = null;
     /**
      * @type {SystemColorScheme[]}
      */
@@ -63,10 +63,6 @@ export class FluxColorScheme {
      * @type {string[]}
      */
     #variables;
-    /**
-     * @type {CSSStyleRule | null}
-     */
-    #style_sheet_rule = null;
 
     /**
      * @param {Document | ShadowRoot | null} root
@@ -76,12 +72,11 @@ export class FluxColorScheme {
      * @param {SystemColorScheme[] | null} system_color_schemes
      * @param {boolean | null} set_system_color_schemes
      * @param {boolean | null} show_color_scheme_accent_color
-     * @param {FluxLocalizationApi | null} flux_localization_api
-     * @param {FluxSettingsApi | null} flux_settings_api
-     * @param {string | null} settings_prefix
+     * @param {Localization | null} localization
+     * @param {SettingsStorage | null} settings_storage
      * @returns {Promise<FluxColorScheme>}
      */
-    static async new(root = null, color_schemes = null, default_color_scheme = null, variables = null, system_color_schemes = null, set_system_color_schemes = null, show_color_scheme_accent_color = null, flux_localization_api = null, flux_settings_api = null, settings_prefix = null) {
+    static async new(root = null, color_schemes = null, default_color_scheme = null, variables = null, system_color_schemes = null, set_system_color_schemes = null, show_color_scheme_accent_color = null, localization = null, settings_storage = null) {
         const _color_schemes = color_schemes ?? DEFAULT_COLOR_SCHEMES;
 
         const flux_color_scheme = new this(
@@ -92,10 +87,16 @@ export class FluxColorScheme {
             system_color_schemes ?? DEFAULT_SYSTEM_COLOR_SCHEMES,
             set_system_color_schemes ?? false,
             show_color_scheme_accent_color ?? false,
-            flux_localization_api,
-            flux_settings_api,
-            settings_prefix ?? ""
+            localization,
+            settings_storage
         );
+
+        if (flux_color_scheme.#localization !== null) {
+            await flux_color_scheme.#localization.addModule(
+                `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/Localization`,
+                LOCALIZATION_MODULE_COLOR_SCHEME
+            );
+        }
 
         await flux_color_scheme.#render();
 
@@ -110,12 +111,11 @@ export class FluxColorScheme {
      * @param {SystemColorScheme[]} system_color_schemes
      * @param {boolean} set_system_color_schemes
      * @param {boolean} show_color_scheme_accent_color
-     * @param {FluxLocalizationApi | null} flux_localization_api
-     * @param {FluxSettingsApi | null} flux_settings_api
-     * @param {string} settings_prefix
+     * @param {Localization | null} localization
+     * @param {SettingsStorage | null} settings_storage
      * @private
      */
-    constructor(root, color_schemes, default_color_scheme, variables, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, flux_localization_api, flux_settings_api, settings_prefix) {
+    constructor(root, color_schemes, default_color_scheme, variables, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, localization, settings_storage) {
         this.#root = root;
         this.#color_schemes = color_schemes;
         this.#default_color_scheme = default_color_scheme;
@@ -123,19 +123,11 @@ export class FluxColorScheme {
         this.#system_color_schemes = system_color_schemes;
         this.#set_system_color_schemes = set_system_color_schemes;
         this.#show_color_scheme_accent_color = show_color_scheme_accent_color;
-        this.#flux_localization_api = flux_localization_api;
-        this.#flux_settings_api = flux_settings_api;
-        this.#settings_prefix = settings_prefix;
+        this.#localization = localization;
+        this.#settings_storage = settings_storage;
 
         if (this.#root !== document) {
             this.#root.adoptedStyleSheets.unshift(root_css);
-        }
-
-        if (this.#flux_localization_api !== null) {
-            this.#flux_localization_api.addModule(
-                `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/Localization`,
-                COLOR_SCHEME_LOCALIZATION_MODULE
-            );
         }
     }
 
@@ -262,8 +254,8 @@ export class FluxColorScheme {
      * @returns {Promise<FluxSelectColorSchemeElement>}
      */
     async getSelectColorSchemeElement() {
-        if (this.#flux_localization_api === null) {
-            throw new Error("Missing FluxLocalizationApi");
+        if (this.#localization === null) {
+            throw new Error("Missing Localization");
         }
 
         return (await import("./ColorScheme/FluxSelectColorSchemeElement.mjs")).FluxSelectColorSchemeElement.new(
@@ -273,11 +265,11 @@ export class FluxColorScheme {
             this.#show_color_scheme_accent_color,
             await this.#getSettings(),
             async settings => {
-                await this.#setSettings(
+                await this.#storeSettings(
                     settings
                 );
             },
-            this.#flux_localization_api
+            this.#localization
         );
     }
 
@@ -310,8 +302,8 @@ export class FluxColorScheme {
     async #getSettings() {
         let color_scheme = null;
 
-        const name = await this.#flux_settings_api?.get(
-            `${this.#settings_prefix}${COLOR_SCHEME_SETTINGS_KEY}`
+        const name = await this.#settings_storage?.get(
+            SETTINGS_STORAGE_KEY_COLOR_SCHEME
         ) ?? null;
 
         if (name !== null) {
@@ -330,8 +322,8 @@ export class FluxColorScheme {
             throw new Error("Invalid color scheme");
         }
 
-        const system = this.#set_system_color_schemes ? await this.#flux_settings_api?.get(
-            `${this.#settings_prefix}${COLOR_SCHEME_SYSTEM_SETTINGS_KEY}`
+        const system = this.#set_system_color_schemes ? await this.#settings_storage?.get(
+            SETTINGS_STORAGE_KEY_COLOR_SCHEME_SYSTEM
         ) ?? null : null;
 
         return [
@@ -465,19 +457,19 @@ export class FluxColorScheme {
      * @param {[ColorScheme, {[key: string]: ColorScheme}]} settings
      * @returns {Promise<void>}
      */
-    async #setSettings(settings) {
-        if (this.#flux_settings_api === null) {
-            throw new Error("Missing FluxSettingsApi");
+    async #storeSettings(settings) {
+        if (this.#settings_storage === null) {
+            throw new Error("Missing SettingsStorage");
         }
 
-        await this.#flux_settings_api.store(
-            `${this.#settings_prefix}${COLOR_SCHEME_SETTINGS_KEY}`,
+        await this.#settings_storage.store(
+            SETTINGS_STORAGE_KEY_COLOR_SCHEME,
             settings[0].name
         );
 
         if (this.#set_system_color_schemes) {
-            await this.#flux_settings_api.store(
-                `${this.#settings_prefix}${COLOR_SCHEME_SYSTEM_SETTINGS_KEY}`,
+            await this.#settings_storage.store(
+                SETTINGS_STORAGE_KEY_COLOR_SCHEME_SYSTEM,
                 Object.fromEntries(Object.entries(settings[1]).map(([
                     name,
                     color_scheme
@@ -487,8 +479,8 @@ export class FluxColorScheme {
                     ]))
             );
         } else {
-            await this.#flux_settings_api.delete(
-                `${this.#settings_prefix}${COLOR_SCHEME_SYSTEM_SETTINGS_KEY}`
+            await this.#settings_storage.delete(
+                SETTINGS_STORAGE_KEY_COLOR_SCHEME_SYSTEM
             );
         }
 

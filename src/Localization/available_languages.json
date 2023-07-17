@@ -1,7 +1,7 @@
 [
     {
         "language": "de",
-        "fallback_for_languages": [
+        "fallback-for-languages": [
             "de-AT",
             "de-CH",
             "de-DE",

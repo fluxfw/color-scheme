@@ -3,7 +3,7 @@ import { flux_css_api } from "../../../flux-css-api/src/FluxCssApi.mjs";
 import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_PREFIX } from "./COLOR_SCHEME_VARIABLE.mjs";
 
 /** @typedef {import("./ColorScheme.mjs").ColorScheme} ColorScheme */
-/** @typedef {import("../../../flux-localization-api/src/FluxLocalizationApi.mjs").FluxLocalizationApi} FluxLocalizationApi */
+/** @typedef {import("../Localization/Localization.mjs").Localization} Localization */
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
 const root_css = await flux_css_api.import(
@@ -18,17 +18,17 @@ const css = await flux_css_api.import(
 
 export class FluxSelectColorSchemeElement extends HTMLElement {
     /**
-     * @type {FluxLocalizationApi}
+     * @type {Localization}
      */
-    #flux_localization_api;
-    /**
-     * @type {ShadowRoot}
-     */
-    #shadow;
+    #localization;
     /**
      * @type {boolean}
      */
     #set_system_color_schemes;
+    /**
+     * @type {ShadowRoot}
+     */
+    #shadow;
     /**
      * @type {boolean}
      */
@@ -44,16 +44,16 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
      * @param {boolean} set_system_color_schemes
      * @param {boolean} show_color_scheme_accent_color
      * @param {[ColorScheme, {[key: string]: ColorScheme}]} settings
-     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} setSettings
-     * @param {FluxLocalizationApi} flux_localization_api
+     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} store_settings
+     * @param {Localization} localization
      * @returns {Promise<FluxSelectColorSchemeElement>}
      */
-    static async new(color_schemes, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, settings, setSettings, flux_localization_api) {
+    static async new(color_schemes, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, settings, store_settings, localization) {
         const flux_select_color_scheme_element = new this(
             system_color_schemes,
             set_system_color_schemes,
             show_color_scheme_accent_color,
-            flux_localization_api
+            localization
         );
 
         const color_schemes_element = document.createElement("div");
@@ -68,11 +68,11 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             async color_scheme => {
                 settings[0] = color_scheme;
 
-                await setSettings(
+                await store_settings(
                     settings
                 );
             },
-            setSettings
+            store_settings
         );
         flux_select_color_scheme_element.#shadow.append(color_schemes_element);
 
@@ -83,16 +83,16 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
      * @param {SystemColorScheme[]} system_color_schemes
      * @param {boolean} set_system_color_schemes
      * @param {boolean} show_color_scheme_accent_color
-     * @param {FluxLocalizationApi} flux_localization_api
+     * @param {Localization} localization
      * @private
      */
-    constructor(system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, flux_localization_api) {
+    constructor(system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, localization) {
         super();
 
         this.#system_color_schemes = system_color_schemes;
         this.#set_system_color_schemes = set_system_color_schemes;
         this.#show_color_scheme_accent_color = show_color_scheme_accent_color;
-        this.#flux_localization_api = flux_localization_api;
+        this.#localization = localization;
 
         this.#shadow = this.attachShadow({
             mode: "closed"
@@ -105,11 +105,11 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
      * @param {HTMLDivElement} parent_element
      * @param {ColorScheme[]} color_schemes
      * @param {[ColorScheme, {[key: string]: ColorScheme}]} settings
-     * @param {(color_scheme: ColorScheme) => Promise<void>} setColorScheme
-     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} setSettings
+     * @param {(color_scheme: ColorScheme) => Promise<void>} set_color_scheme
+     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} store_settings
      * @returns {Promise<void>}
      */
-    async #render(parent_element, color_schemes, settings, setColorScheme, setSettings) {
+    async #render(parent_element, color_schemes, settings, set_color_scheme, store_settings) {
         const variables = [
             COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR,
             COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR
@@ -122,7 +122,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                 color_scheme_element.dataset.selected = true;
             }
             color_scheme_element.title = await color_scheme.getLabel(
-                this.#flux_localization_api
+                this.#localization
             );
             color_scheme_element.type = "button";
 
@@ -165,7 +165,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
 
                 color_scheme_element.dataset.selected = true;
 
-                await setColorScheme(
+                await set_color_scheme(
                     color_scheme
                 );
 
@@ -173,7 +173,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                     parent_element,
                     color_schemes,
                     settings,
-                    setSettings
+                    store_settings
                 );
             });
 
@@ -184,7 +184,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             parent_element,
             color_schemes,
             settings,
-            setSettings
+            store_settings
         );
     }
 
@@ -192,10 +192,10 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
      * @param {HTMLDivElement} parent_element
      * @param {ColorScheme[]} color_schemes
      * @param {[ColorScheme, {[key: string]: ColorScheme}]} settings
-     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} setSettings
+     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} store_settings
      * @returns {Promise<void>}
      */
-    async #updateSystemColorSchemeSelector(parent_element, color_schemes, settings, setSettings) {
+    async #updateSystemColorSchemeSelector(parent_element, color_schemes, settings, store_settings) {
         if (!this.#set_system_color_schemes) {
             return;
         }
@@ -213,7 +213,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             title_element.classList.add("title");
             title_element.dataset.system_selector = true;
             title_element.innerText = await system_color_scheme.getLabel(
-                this.#flux_localization_api
+                this.#localization
             );
             parent_element.append(title_element);
 
@@ -230,17 +230,17 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                 async color_scheme => {
                     settings[1][system_color_scheme.name] = color_scheme;
 
-                    await setSettings(
+                    await store_settings(
                         settings
                     );
                 },
-                setSettings
+                store_settings
             );
             parent_element.append(color_schemes_element);
         }
     }
 }
 
-export const SELECT_COLOR_SCHEME_ELEMENT_TAG_NAME = "flux-select-color-scheme";
+export const FLUX_SELECT_COLOR_SCHEME_ELEMENT_TAG_NAME = "flux-select-color-scheme";
 
-customElements.define(SELECT_COLOR_SCHEME_ELEMENT_TAG_NAME, FluxSelectColorSchemeElement);
+customElements.define(FLUX_SELECT_COLOR_SCHEME_ELEMENT_TAG_NAME, FluxSelectColorSchemeElement);

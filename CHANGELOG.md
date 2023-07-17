@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-07-17-1
+
+Changes:
+
+- General `SettingsStorage` and `Localization`
+
 ## v2023-07-10-1
 
 Changes:

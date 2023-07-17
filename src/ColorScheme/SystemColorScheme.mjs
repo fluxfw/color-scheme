@@ -1,5 +1,5 @@
-/** @typedef {import("../../../flux-localization-api/src/FluxLocalizationApi.mjs").FluxLocalizationApi} FluxLocalizationApi */
+/** @typedef {import("../Localization/Localization.mjs").Localization} Localization */
 
 /**
- * @typedef {{"default-color-scheme": string, detector: MediaQueryList, getLabel: (flux_localization_api: FluxLocalizationApi) => Promise<string>, name: string, "use-in-color-scheme": boolean}} SystemColorScheme
+ * @typedef {{"default-color-scheme": string, detector: MediaQueryList, getLabel: (localization: Localization) => Promise<string>, name: string, "use-in-color-scheme": boolean}} SystemColorScheme
  */
