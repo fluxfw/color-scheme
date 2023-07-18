@@ -28,7 +28,7 @@ export class FluxColorScheme {
      */
     #default_color_scheme;
     /**
-     * @type {() => {} | null}
+     * @type {(() => Promise<void>) | null}
      */
     #init_system_color_scheme_detectors = null;
     /**
@@ -395,8 +395,8 @@ export class FluxColorScheme {
                 return;
             }
 
-            this.#init_system_color_scheme_detectors = () => {
-                this.#render();
+            this.#init_system_color_scheme_detectors = async () => {
+                await this.#render();
             };
 
             for (const system_color_scheme of this.#system_color_schemes) {

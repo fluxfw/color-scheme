@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-07-18-1
+
+Changes:
+
+- `init_system_color_scheme_detectors`
+
 ## v2023-07-17-1
 
 Changes:
