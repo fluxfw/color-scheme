@@ -28,9 +28,6 @@
 }
 
 .color_scheme {
-    --flux-select-color-scheme-color-scheme-accent-color: var(--flux-color-scheme-accent-color, #000000);
-    --flux-select-color-scheme-color-scheme-background-color: var(--flux-color-scheme-background-color, #ffffff);
-    --flux-select-color-scheme-color-scheme-foreground-color: var(--flux-color-scheme-foreground-color, #000000);
     background-clip: content-box;
     background-color: var(--flux-select-color-scheme-color-scheme-background-color);
     border: 1px solid rgb(var(--flux-select-color-scheme-color-scheme-border-color-rgb), 0.5);

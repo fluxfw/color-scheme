@@ -1,5 +1,5 @@
 import { COLOR_SCHEME_SYSTEM } from "./ColorScheme/COLOR_SCHEME.mjs";
-import { flux_css_api } from "../../flux-css-api/src/FluxCssApi.mjs";
+import { flux_import_css } from "../../flux-style-sheet-manager/src/FluxImportCss.mjs";
 import { LOCALIZATION_MODULE } from "./Localization/LOCALIZATION_MODULE.mjs";
 import { LOCALIZATIONS } from "./Localization/LOCALIZATIONS.mjs";
 import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_RGB, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_COLOR_SCHEME, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_PREFIX, COLOR_SCHEME_VARIABLE_RGB_SUFFIX, DEFAULT_COLOR_SCHEME_VARIABLES } from "./ColorScheme/COLOR_SCHEME_VARIABLE.mjs";
@@ -11,13 +11,12 @@ import { SETTINGS_STORAGE_KEY_COLOR_SCHEME, SETTINGS_STORAGE_KEY_COLOR_SCHEME_SY
 /** @typedef {import("./ColorScheme/FluxSelectColorSchemeElement.mjs").FluxSelectColorSchemeElement} FluxSelectColorSchemeElement */
 /** @typedef {import("./Localization/Localization.mjs").Localization} Localization */
 /** @typedef {import("./SettingsStorage/SettingsStorage.mjs").SettingsStorage} SettingsStorage */
+/** @typedef {import("./StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./ColorScheme/SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
-const root_css = await flux_css_api.import(
+const root_css = await flux_import_css.import(
     `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/ColorScheme/FluxColorSchemeRoot.css`
 );
-
-document.adoptedStyleSheets.unshift(root_css);
 
 export class FluxColorScheme {
     /**
@@ -53,6 +52,10 @@ export class FluxColorScheme {
      */
     #show_color_scheme_accent_color;
     /**
+     * @type {StyleSheetManager | null}
+     */
+    #style_sheet_manager;
+    /**
      * @type {CSSStyleRule | null}
      */
     #style_sheet_rule = null;
@@ -75,13 +78,31 @@ export class FluxColorScheme {
      * @param {boolean | null} show_color_scheme_accent_color
      * @param {Localization | null} localization
      * @param {SettingsStorage | null} settings_storage
+     * @param {StyleSheetManager | null} style_sheet_manager
      * @returns {Promise<FluxColorScheme>}
      */
-    static async new(root = null, color_schemes = null, default_color_scheme = null, variables = null, system_color_schemes = null, set_system_color_schemes = null, show_color_scheme_accent_color = null, localization = null, settings_storage = null) {
+    static async new(root = null, color_schemes = null, default_color_scheme = null, variables = null, system_color_schemes = null, set_system_color_schemes = null, show_color_scheme_accent_color = null, localization = null, settings_storage = null, style_sheet_manager = null) {
+        const _root = root ?? document;
+
+        if (style_sheet_manager !== null) {
+            await style_sheet_manager.addRoot(
+                _root
+            );
+
+            await style_sheet_manager.addStyleSheet(
+                root_css,
+                true
+            );
+        } else {
+            if (!_root.adoptedStyleSheets.includes(root_css)) {
+                _root.adoptedStyleSheets.unshift(root_css);
+            }
+        }
+
         const _color_schemes = color_schemes ?? DEFAULT_COLOR_SCHEMES;
 
         const flux_color_scheme = new this(
-            root ?? document,
+            _root,
             _color_schemes,
             default_color_scheme ?? (_color_schemes.some(color_scheme => color_scheme.name === COLOR_SCHEME_SYSTEM) ? null : _color_schemes[0]?.name ?? null) ?? COLOR_SCHEME_SYSTEM,
             variables ?? DEFAULT_COLOR_SCHEME_VARIABLES,
@@ -89,7 +110,8 @@ export class FluxColorScheme {
             set_system_color_schemes ?? false,
             show_color_scheme_accent_color ?? false,
             localization,
-            settings_storage
+            settings_storage,
+            style_sheet_manager
         );
 
         if (flux_color_scheme.#localization !== null) {
@@ -114,9 +136,10 @@ export class FluxColorScheme {
      * @param {boolean} show_color_scheme_accent_color
      * @param {Localization | null} localization
      * @param {SettingsStorage | null} settings_storage
+     * @param {StyleSheetManager | null} style_sheet_manager
      * @private
      */
-    constructor(root, color_schemes, default_color_scheme, variables, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, localization, settings_storage) {
+    constructor(root, color_schemes, default_color_scheme, variables, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, localization, settings_storage, style_sheet_manager) {
         this.#root = root;
         this.#color_schemes = color_schemes;
         this.#default_color_scheme = default_color_scheme;
@@ -126,10 +149,7 @@ export class FluxColorScheme {
         this.#show_color_scheme_accent_color = show_color_scheme_accent_color;
         this.#localization = localization;
         this.#settings_storage = settings_storage;
-
-        if (this.#root !== document) {
-            this.#root.adoptedStyleSheets.unshift(root_css);
-        }
+        this.#style_sheet_manager = style_sheet_manager;
     }
 
     /**
@@ -270,7 +290,8 @@ export class FluxColorScheme {
                     settings
                 );
             },
-            this.#localization
+            this.#localization,
+            this.#style_sheet_manager
         );
     }
 
@@ -376,7 +397,7 @@ export class FluxColorScheme {
 
         if (this.#style_sheet_rule === null) {
             const style_sheet = new CSSStyleSheet();
-            await style_sheet.replace(`:${this.#root instanceof Document ? "root" : "host"} { }`);
+            await style_sheet.replace(":root, :host { }");
             [
                 this.#style_sheet_rule
             ] = style_sheet.cssRules;
