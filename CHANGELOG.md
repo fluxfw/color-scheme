@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-08-07-1
+
+Changes:
+
+- `flux-localization-api`
+
 ## v2023-07-31-1
 
 Changes:
