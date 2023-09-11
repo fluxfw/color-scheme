@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-09-11-1
+
+Changes:
+
+- Fix Firefox based browsers crash with open dev console
+
 ## v2023-08-07-1
 
 Changes:

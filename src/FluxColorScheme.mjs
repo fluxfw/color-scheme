@@ -397,7 +397,7 @@ export class FluxColorScheme {
 
         if (this.#style_sheet_rule === null) {
             const style_sheet = new CSSStyleSheet();
-            await style_sheet.replace(":root, :host { }");
+            style_sheet.insertRule(":root, :host { }");
             [
                 this.#style_sheet_rule
             ] = style_sheet.cssRules;
