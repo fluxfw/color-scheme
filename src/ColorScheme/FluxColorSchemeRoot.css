@@ -15,8 +15,3 @@
     color: var(--flux-color-scheme-foreground-color, #000000);
     color-scheme: var(--flux-color-scheme-color-scheme, light);
 }
-
-::selection {
-    background-color: var(--flux-color-scheme-accent-color, #000000);
-    color: var(--flux-color-scheme-accent-color-foreground-color, #ffffff);
-}

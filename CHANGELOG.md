@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-09-25-1
+
+Changes:
+
+- Make selection works in shadows
+
 ## v2023-09-11-1
 
 Changes:

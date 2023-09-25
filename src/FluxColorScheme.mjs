@@ -18,6 +18,10 @@ const root_css = await flux_import_css.import(
     `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/ColorScheme/FluxColorSchemeRoot.css`
 );
 
+const shadow_css = await flux_import_css.import(
+    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/ColorScheme/FluxColorSchemeShadow.css`
+);
+
 export class FluxColorScheme {
     /**
      * @type {ColorScheme[]}
@@ -89,11 +93,20 @@ export class FluxColorScheme {
                 _root
             );
 
-            await style_sheet_manager.addStyleSheet(
+            await style_sheet_manager.addShadowStyleSheet(
+                shadow_css,
+                true
+            );
+
+            await style_sheet_manager.addRootStyleSheet(
                 root_css,
                 true
             );
         } else {
+            if (!_root.adoptedStyleSheets.includes(shadow_css)) {
+                _root.adoptedStyleSheets.unshift(shadow_css);
+            }
+
             if (!_root.adoptedStyleSheets.includes(root_css)) {
                 _root.adoptedStyleSheets.unshift(root_css);
             }
@@ -397,10 +410,7 @@ export class FluxColorScheme {
 
         if (this.#style_sheet_rule === null) {
             const style_sheet = new CSSStyleSheet();
-            style_sheet.insertRule(":root, :host { }");
-            [
-                this.#style_sheet_rule
-            ] = style_sheet.cssRules;
+            this.#style_sheet_rule = style_sheet.cssRules[style_sheet.insertRule(":root, :host { }")];
             this.#root.adoptedStyleSheets.push(style_sheet);
         }
 

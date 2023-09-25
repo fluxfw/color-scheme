@@ -1,0 +1,4 @@
+::selection {
+    background-color: var(--flux-color-scheme-accent-color, #000000);
+    color: var(--flux-color-scheme-accent-color-foreground-color, #ffffff);
+}

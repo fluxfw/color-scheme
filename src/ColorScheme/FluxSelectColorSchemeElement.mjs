@@ -52,7 +52,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
      */
     static async new(color_schemes, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, settings, store_settings, localization, style_sheet_manager = null) {
         if (style_sheet_manager !== null) {
-            await style_sheet_manager.generateVariableStyleSheet(
+            await style_sheet_manager.generateVariablesRootStyleSheet(
                 this.name,
                 {
                     [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
@@ -65,7 +65,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                 true
             );
 
-            await style_sheet_manager.addStyleSheet(
+            await style_sheet_manager.addRootStyleSheet(
                 root_css,
                 true
             );
@@ -81,6 +81,16 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             show_color_scheme_accent_color,
             localization
         );
+
+        flux_select_color_scheme_element.#shadow = flux_select_color_scheme_element.attachShadow({
+            mode: "closed"
+        });
+
+        await style_sheet_manager.addStyleSheetsToShadow(
+            flux_select_color_scheme_element.#shadow
+        );
+
+        flux_select_color_scheme_element.#shadow.adoptedStyleSheets.push(css);
 
         const color_schemes_element = document.createElement("div");
         color_schemes_element.classList.add("color_schemes");
@@ -119,12 +129,6 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
         this.#set_system_color_schemes = set_system_color_schemes;
         this.#show_color_scheme_accent_color = show_color_scheme_accent_color;
         this.#localization = localization;
-
-        this.#shadow = this.attachShadow({
-            mode: "closed"
-        });
-
-        this.#shadow.adoptedStyleSheets.push(css);
     }
 
     /**
