@@ -461,7 +461,7 @@ export class FluxColorScheme {
 
         for (const variable of this.#variables) {
             if (variable.endsWith(COLOR_SCHEME_VARIABLE_RGB_SUFFIX)) {
-                const _variable = variable.substring(0, variable.length - COLOR_SCHEME_VARIABLE_RGB_SUFFIX.length);
+                const _variable = variable.slice(0, -COLOR_SCHEME_VARIABLE_RGB_SUFFIX.length);
 
                 if (!this.#variables.includes(_variable)) {
                     for (const _color_scheme of this.#color_schemes.filter(__color_scheme => __color_scheme.name !== COLOR_SCHEME_SYSTEM)) {
