@@ -53,7 +53,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
     static async new(color_schemes, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, settings, store_settings, localization, style_sheet_manager = null) {
         if (style_sheet_manager !== null) {
             await style_sheet_manager.generateVariablesRootStyleSheet(
-                this.name,
+                FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX,
                 {
                     [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
                     [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-accent-color`]: "accent-color",
