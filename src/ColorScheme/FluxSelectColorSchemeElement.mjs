@@ -1,19 +1,12 @@
 import { COLOR_SCHEME_SYSTEM } from "./COLOR_SCHEME.mjs";
-import { flux_import_css } from "../../../flux-style-sheet-manager/src/FluxImportCss.mjs";
+import css from "./FluxSelectColorSchemeElement.css" with { type: "css" };
+import root_css from "./FluxSelectColorSchemeElementRoot.css" with { type: "css" };
 import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_PREFIX } from "./COLOR_SCHEME_VARIABLE.mjs";
 
 /** @typedef {import("./ColorScheme.mjs").ColorScheme} ColorScheme */
 /** @typedef {import("../Localization/Localization.mjs").Localization} Localization */
 /** @typedef {import("../StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
-
-const root_css = await flux_import_css.import(
-    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxSelectColorSchemeElementRoot.css`
-);
-
-const css = await flux_import_css.import(
-    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxSelectColorSchemeElement.css`
-);
 
 export const FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX = "--flux-select-color-scheme-";
 

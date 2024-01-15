@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-01-15-1
+
+Changes:
+
+- Load css using import attributes
+
 ## v2023-12-12-2
 
 Changes:
