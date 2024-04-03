@@ -240,7 +240,7 @@ export class FluxColorScheme {
             }
 
             if (_color_scheme === null) {
-                throw new Error("Invalid color scheme");
+                throw new Error("Invalid color scheme!");
             }
         }
 
@@ -282,7 +282,7 @@ export class FluxColorScheme {
      */
     async getSelectColorSchemeElement() {
         if (this.#localization === null) {
-            throw new Error("Missing Localization");
+            throw new Error("Missing Localization!");
         }
 
         return (await import("./ColorScheme/FluxSelectColorSchemeElement.mjs")).FluxSelectColorSchemeElement.new(
@@ -347,7 +347,7 @@ export class FluxColorScheme {
         }
 
         if (color_scheme === null) {
-            throw new Error("Invalid color scheme");
+            throw new Error("Invalid color scheme!");
         }
 
         const system = this.#set_system_color_schemes ? await this.#settings_storage?.get(
@@ -378,7 +378,7 @@ export class FluxColorScheme {
                 }
 
                 if (_color_scheme === null) {
-                    throw new Error("Invalid color scheme");
+                    throw new Error("Invalid color scheme!");
                 }
 
                 return [
@@ -484,7 +484,7 @@ export class FluxColorScheme {
      */
     async #storeSettings(settings) {
         if (this.#settings_storage === null) {
-            throw new Error("Missing SettingsStorage");
+            throw new Error("Missing SettingsStorage!");
         }
 
         await this.#settings_storage.store(
