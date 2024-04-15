@@ -1,6 +1,4 @@
 import { COLOR_SCHEME_SYSTEM } from "./ColorScheme/COLOR_SCHEME.mjs";
-import { LOCALIZATION_MODULE } from "./Localization/LOCALIZATION_MODULE.mjs";
-import { LOCALIZATIONS } from "./Localization/LOCALIZATIONS.mjs";
 import root_css from "./ColorScheme/FluxColorSchemeRoot.css" with { type: "css" };
 import shadow_css from "./ColorScheme/FluxColorSchemeShadow.css" with { type: "css" };
 import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_RGB, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_COLOR_SCHEME, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_PREFIX, COLOR_SCHEME_VARIABLE_RGB_SUFFIX, DEFAULT_COLOR_SCHEME_VARIABLES } from "./ColorScheme/COLOR_SCHEME_VARIABLE.mjs";
@@ -119,13 +117,6 @@ export class FluxColorScheme {
             settings_storage,
             style_sheet_manager
         );
-
-        if (flux_color_scheme.#localization !== null) {
-            await flux_color_scheme.#localization.addModule(
-                LOCALIZATION_MODULE,
-                LOCALIZATIONS
-            );
-        }
 
         await flux_color_scheme.#render();
 

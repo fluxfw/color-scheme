@@ -144,7 +144,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             if (color_scheme.name === settings[0].name) {
                 color_scheme_element.dataset.selected = true;
             }
-            color_scheme_element.title = await color_scheme.getLabel(
+            color_scheme_element.title = await color_scheme.label(
                 this.#localization
             );
             color_scheme_element.type = "button";
@@ -235,7 +235,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             const title_element = document.createElement("div");
             title_element.classList.add("title");
             title_element.dataset.system_selector = true;
-            title_element.innerText = await system_color_scheme.getLabel(
+            title_element.innerText = await system_color_scheme.label(
                 this.#localization
             );
             parent_element.append(title_element);
