@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-04-26-1
+
+Changes:
+
+- Use `Object.freeze` direct without `map`
+
 ## v2024-04-15-1
 
 Changes:

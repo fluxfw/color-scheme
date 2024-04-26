@@ -9,34 +9,34 @@ import { LOCALIZATION_KEY_DARK, LOCALIZATION_KEY_LIGHT, LOCALIZATION_KEY_SYSTEM_
  * @type {ColorScheme[]}
  */
 export const DEFAULT_COLOR_SCHEMES = Object.freeze([
-    {
+    Object.freeze({
         label: async localization => localization.translate(
             LOCALIZATION_MODULE,
             LOCALIZATION_KEY_SYSTEM_BASED
         ),
         name: COLOR_SCHEME_SYSTEM
-    },
-    {
+    }),
+    Object.freeze({
         label: async localization => localization.translate(
             LOCALIZATION_MODULE,
             LOCALIZATION_KEY_LIGHT
         ),
         name: COLOR_SCHEME_LIGHT
-    },
-    {
+    }),
+    Object.freeze({
         label: async localization => localization.translate(
             LOCALIZATION_MODULE,
             LOCALIZATION_KEY_DARK
         ),
         name: COLOR_SCHEME_DARK
-    }
-].map(color_scheme => Object.freeze(color_scheme)));
+    })
+]);
 
 /**
  * @type {SystemColorScheme[]}
  */
 export const DEFAULT_SYSTEM_COLOR_SCHEMES = Object.freeze([
-    {
+    Object.freeze({
         "default-color-scheme": COLOR_SCHEME_LIGHT,
         detector: matchMedia(`(prefers-color-scheme: ${COLOR_SCHEME_LIGHT})`),
         label: async localization => localization.translate(
@@ -45,8 +45,8 @@ export const DEFAULT_SYSTEM_COLOR_SCHEMES = Object.freeze([
         ),
         name: COLOR_SCHEME_LIGHT,
         "use-in-color-scheme": true
-    },
-    {
+    }),
+    Object.freeze({
         "default-color-scheme": COLOR_SCHEME_DARK,
         detector: matchMedia(`(prefers-color-scheme: ${COLOR_SCHEME_DARK})`),
         label: async localization => localization.translate(
@@ -55,5 +55,5 @@ export const DEFAULT_SYSTEM_COLOR_SCHEMES = Object.freeze([
         ),
         name: COLOR_SCHEME_DARK,
         "use-in-color-scheme": true
-    }
-].map(system_color_scheme => Object.freeze(system_color_scheme)));
+    })
+]);
