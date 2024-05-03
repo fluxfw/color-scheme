@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-05-03-1
+
+Changes:
+
+- `change` event
+
 ## v2024-04-26-1
 
 Changes:

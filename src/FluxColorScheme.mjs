@@ -13,7 +13,9 @@ import { SETTINGS_STORAGE_KEY_COLOR_SCHEME, SETTINGS_STORAGE_KEY_COLOR_SCHEME_SY
 /** @typedef {import("./StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./ColorScheme/SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
-export class FluxColorScheme {
+export const FLUX_COLOR_SCHEME_EVENT_CHANGE = "flux-color-scheme-change";
+
+export class FluxColorScheme extends EventTarget {
     /**
      * @type {ColorScheme[]}
      */
@@ -22,10 +24,6 @@ export class FluxColorScheme {
      * @type {string}
      */
     #default_color_scheme;
-    /**
-     * @type {(() => Promise<void>) | null}
-     */
-    #init_system_color_scheme_detectors = null;
     /**
      * @type {Localization | null}
      */
@@ -54,6 +52,10 @@ export class FluxColorScheme {
      * @type {CSSStyleRule | null}
      */
     #style_sheet_rule = null;
+    /**
+     * @type {AbortController | null}
+     */
+    #system_color_scheme_detectors_abort_controller = null;
     /**
      * @type {SystemColorScheme[]}
      */
@@ -137,6 +139,8 @@ export class FluxColorScheme {
      * @private
      */
     constructor(root, color_schemes, default_color_scheme, variables, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, localization, settings_storage, style_sheet_manager) {
+        super();
+
         this.#root = root;
         this.#color_schemes = color_schemes;
         this.#default_color_scheme = default_color_scheme;
@@ -407,27 +411,27 @@ export class FluxColorScheme {
      */
     async #initSystemColorSchemesDetectors(is_system_color_scheme) {
         if (is_system_color_scheme) {
-            if (this.#init_system_color_scheme_detectors !== null) {
+            if (this.#system_color_scheme_detectors_abort_controller !== null) {
                 return;
             }
 
-            this.#init_system_color_scheme_detectors = async () => {
-                await this.#render();
-            };
+            this.#system_color_scheme_detectors_abort_controller = new AbortController();
 
             for (const system_color_scheme of this.#system_color_schemes) {
-                system_color_scheme.detector.addEventListener("change", this.#init_system_color_scheme_detectors);
+                system_color_scheme.detector.addEventListener("change", async () => {
+                    await this.#render();
+                }, {
+                    signal: this.#system_color_scheme_detectors_abort_controller.signal
+                });
             }
         } else {
-            if (this.#init_system_color_scheme_detectors === null) {
+            if (this.#system_color_scheme_detectors_abort_controller === null) {
                 return;
             }
 
-            for (const system_color_scheme of this.#system_color_schemes) {
-                system_color_scheme.detector.removeEventListener("change", this.#init_system_color_scheme_detectors);
-            }
+            this.#system_color_scheme_detectors_abort_controller.abort();
 
-            this.#init_system_color_scheme_detectors = null;
+            this.#system_color_scheme_detectors_abort_controller = null;
         }
     }
 
@@ -467,6 +471,12 @@ export class FluxColorScheme {
                 this.#root.head.append(theme_color_meta_element);
             }
         }
+
+        this.dispatchEvent(new CustomEvent(FLUX_COLOR_SCHEME_EVENT_CHANGE, {
+            detail: {
+                color_scheme
+            }
+        }));
     }
 
     /**
