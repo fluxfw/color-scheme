@@ -120,7 +120,9 @@ export class FluxColorScheme extends EventTarget {
             style_sheet_manager
         );
 
-        await flux_color_scheme.#render();
+        await flux_color_scheme.#render(
+            false
+        );
 
         return flux_color_scheme;
     }
@@ -436,9 +438,10 @@ export class FluxColorScheme extends EventTarget {
     }
 
     /**
+     * @param {boolean | null} event
      * @returns {Promise<void>}
      */
-    async #render() {
+    async #render(event = null) {
         const color_scheme = await this.getColorScheme();
 
         const style_sheet_rule = await this.#getStyleSheetRule();
@@ -470,6 +473,10 @@ export class FluxColorScheme extends EventTarget {
             if (!theme_color_meta_element.isConnected) {
                 this.#root.head.append(theme_color_meta_element);
             }
+        }
+
+        if (!(event ?? true)) {
+            return;
         }
 
         this.dispatchEvent(new CustomEvent(FLUX_COLOR_SCHEME_EVENT_CHANGE, {
