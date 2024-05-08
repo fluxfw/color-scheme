@@ -1,12 +1,12 @@
-import { COLOR_SCHEME_SYSTEM } from "../COLOR_SCHEME.mjs";
+import { COLOR_SCHEME_SYSTEM } from "./COLOR_SCHEME.mjs";
 import css from "./SelectColorSchemeElement.css" with { type: "css" };
 import root_css from "./SelectColorSchemeElementRoot.css" with { type: "css" };
-import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR } from "../COLOR_SCHEME_VARIABLE.mjs";
+import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR } from "./COLOR_SCHEME_VARIABLE.mjs";
 import { COLOR_SCHEMES_VARIABLE_PREFIX } from "./COLOR_SCHEME_VARIABLE.mjs";
 
 /** @typedef {import("./ColorSchemeObject.mjs").ColorSchemeObject} ColorSchemeObject */
-/** @typedef {import("../Localization/Localization.mjs").Localization} Localization */
-/** @typedef {import("../StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
+/** @typedef {import("./Localization/Localization.mjs").Localization} Localization */
+/** @typedef {import("./StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
 export const SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX = "--select-color-scheme-";
