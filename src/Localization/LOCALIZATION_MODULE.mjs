@@ -1,1 +1,1 @@
-export const LOCALIZATION_MODULE = "flux-color-scheme";
+export const LOCALIZATION_MODULE = "color-scheme";

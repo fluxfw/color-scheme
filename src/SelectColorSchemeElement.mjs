@@ -1,16 +1,17 @@
-import { COLOR_SCHEME_SYSTEM } from "./COLOR_SCHEME.mjs";
-import css from "./FluxSelectColorSchemeElement.css" with { type: "css" };
-import root_css from "./FluxSelectColorSchemeElementRoot.css" with { type: "css" };
-import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_PREFIX } from "./COLOR_SCHEME_VARIABLE.mjs";
+import { COLOR_SCHEME_SYSTEM } from "../COLOR_SCHEME.mjs";
+import css from "./SelectColorSchemeElement.css" with { type: "css" };
+import root_css from "./SelectColorSchemeElementRoot.css" with { type: "css" };
+import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR } from "../COLOR_SCHEME_VARIABLE.mjs";
+import { COLOR_SCHEMES_VARIABLE_PREFIX } from "./COLOR_SCHEME_VARIABLE.mjs";
 
-/** @typedef {import("./ColorScheme.mjs").ColorScheme} ColorScheme */
+/** @typedef {import("./ColorSchemeObject.mjs").ColorSchemeObject} ColorSchemeObject */
 /** @typedef {import("../Localization/Localization.mjs").Localization} Localization */
 /** @typedef {import("../StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
 
-export const FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX = "--flux-select-color-scheme-";
+export const SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX = "--select-color-scheme-";
 
-export class FluxSelectColorSchemeElement extends HTMLElement {
+export class SelectColorSchemeElement extends HTMLElement {
     /**
      * @type {Localization}
      */
@@ -33,27 +34,27 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
     #system_color_schemes;
 
     /**
-     * @param {ColorScheme[]} color_schemes
+     * @param {ColorSchemeObject[]} color_schemes
      * @param {SystemColorScheme[]} system_color_schemes
      * @param {boolean} set_system_color_schemes
      * @param {boolean} show_color_scheme_accent_color
-     * @param {[ColorScheme, {[key: string]: ColorScheme}]} settings
-     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} store_settings
+     * @param {[ColorSchemeObject, {[key: string]: ColorSchemeObject}]} settings
+     * @param {(settings: [ColorSchemeObject, {[key: string]: ColorSchemeObject}]) => Promise<void>} store_settings
      * @param {Localization} localization
      * @param {StyleSheetManager | null} style_sheet_manager
-     * @returns {Promise<FluxSelectColorSchemeElement>}
+     * @returns {Promise<SelectColorSchemeElement>}
      */
     static async new(color_schemes, system_color_schemes, set_system_color_schemes, show_color_scheme_accent_color, settings, store_settings, localization, style_sheet_manager = null) {
         if (style_sheet_manager !== null) {
             await style_sheet_manager.generateVariablesRootStyleSheet(
-                FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX,
+                SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX,
                 {
-                    [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
-                    [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-accent-color`]: "accent-color",
-                    [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-background-color`]: "background-color",
-                    [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-foreground-color`]: "foreground-color",
-                    [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-outline-color`]: "foreground-color",
-                    [`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}foreground-color`]: "foreground-color"
+                    [`${SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
+                    [`${SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-accent-color`]: "accent-color",
+                    [`${SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-background-color`]: "background-color",
+                    [`${SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-foreground-color`]: "foreground-color",
+                    [`${SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-outline-color`]: "foreground-color",
+                    [`${SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}foreground-color`]: "foreground-color"
                 },
                 true
             );
@@ -68,29 +69,29 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             }
         }
 
-        const flux_select_color_scheme_element = new this(
+        const select_color_scheme_element = new this(
             system_color_schemes,
             set_system_color_schemes,
             show_color_scheme_accent_color,
             localization
         );
 
-        flux_select_color_scheme_element.#shadow = flux_select_color_scheme_element.attachShadow({
+        select_color_scheme_element.#shadow = select_color_scheme_element.attachShadow({
             mode: "closed"
         });
 
         await style_sheet_manager?.addStyleSheetsToShadow(
-            flux_select_color_scheme_element.#shadow
+            select_color_scheme_element.#shadow
         );
 
-        flux_select_color_scheme_element.#shadow.adoptedStyleSheets.push(css);
+        select_color_scheme_element.#shadow.adoptedStyleSheets.push(css);
 
         const color_schemes_element = document.createElement("div");
         color_schemes_element.classList.add("color_schemes");
-        if (flux_select_color_scheme_element.#show_color_scheme_accent_color) {
+        if (select_color_scheme_element.#show_color_scheme_accent_color) {
             color_schemes_element.dataset.show_accent_color = true;
         }
-        await flux_select_color_scheme_element.#render(
+        await select_color_scheme_element.#render(
             color_schemes_element,
             color_schemes,
             settings,
@@ -103,9 +104,9 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
             },
             store_settings
         );
-        flux_select_color_scheme_element.#shadow.append(color_schemes_element);
+        select_color_scheme_element.#shadow.append(color_schemes_element);
 
-        return flux_select_color_scheme_element;
+        return select_color_scheme_element;
     }
 
     /**
@@ -126,10 +127,10 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
 
     /**
      * @param {HTMLDivElement} parent_element
-     * @param {ColorScheme[]} color_schemes
-     * @param {[ColorScheme, {[key: string]: ColorScheme}]} settings
-     * @param {(color_scheme: ColorScheme) => Promise<void>} set_color_scheme
-     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} store_settings
+     * @param {ColorSchemeObject[]} color_schemes
+     * @param {[ColorSchemeObject, {[key: string]: ColorSchemeObject}]} settings
+     * @param {(color_scheme: ColorSchemeObject) => Promise<void>} set_color_scheme
+     * @param {(settings: [ColorSchemeObject, {[key: string]: ColorSchemeObject}]) => Promise<void>} store_settings
      * @returns {Promise<void>}
      */
     async #render(parent_element, color_schemes, settings, set_color_scheme, store_settings) {
@@ -164,7 +165,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                         continue;
                     }
 
-                    color_scheme_element.style.setProperty(`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-${variable}`, `var(${COLOR_SCHEME_VARIABLE_PREFIX}${values[variable]}-${COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR})`);
+                    color_scheme_element.style.setProperty(`${SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-${variable}`, `var(${COLOR_SCHEMES_VARIABLE_PREFIX}${values[variable]}-${COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR})`);
                 }
             } else {
                 for (const variable of [
@@ -173,7 +174,7 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
                     ] : [],
                     ...variables
                 ]) {
-                    color_scheme_element.style.setProperty(`${FLUX_SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-${variable}`, `var(${COLOR_SCHEME_VARIABLE_PREFIX}${color_scheme.name}-${variable})`);
+                    color_scheme_element.style.setProperty(`${SELECT_COLOR_SCHEME_ELEMENT_VARIABLE_PREFIX}color-scheme-${variable}`, `var(${COLOR_SCHEMES_VARIABLE_PREFIX}${color_scheme.name}-${variable})`);
                 }
             }
 
@@ -213,9 +214,9 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
 
     /**
      * @param {HTMLDivElement} parent_element
-     * @param {ColorScheme[]} color_schemes
-     * @param {[ColorScheme, {[key: string]: ColorScheme}]} settings
-     * @param {(settings: [ColorScheme, {[key: string]: ColorScheme}]) => Promise<void>} store_settings
+     * @param {ColorSchemeObject[]} color_schemes
+     * @param {[ColorSchemeObject, {[key: string]: ColorSchemeObject}]} settings
+     * @param {(settings: [ColorSchemeObject, {[key: string]: ColorSchemeObject}]) => Promise<void>} store_settings
      * @returns {Promise<void>}
      */
     async #updateSystemColorSchemeSelector(parent_element, color_schemes, settings, store_settings) {
@@ -264,6 +265,6 @@ export class FluxSelectColorSchemeElement extends HTMLElement {
     }
 }
 
-export const FLUX_SELECT_COLOR_SCHEME_ELEMENT_TAG_NAME = "flux-select-color-scheme";
+export const SELECT_COLOR_SCHEME_ELEMENT_TAG_NAME = "select-color-scheme";
 
-customElements.define(FLUX_SELECT_COLOR_SCHEME_ELEMENT_TAG_NAME, FluxSelectColorSchemeElement);
+customElements.define(SELECT_COLOR_SCHEME_ELEMENT_TAG_NAME, SelectColorSchemeElement);

@@ -1,0 +1,13 @@
+:root, :host {
+    --color-scheme-accent-color: #000000;
+    --color-scheme-accent-color-rgb: 0, 0, 0;
+    --color-scheme-accent-foreground-color: #ffffff;
+    --color-scheme-background-color: #ffffff;
+    --color-scheme-color-scheme: light;
+    --color-scheme-foreground-color: #000000;
+    -webkit-tap-highlight-color: rgba(var(--color-scheme-accent-color-rgb), 0.5);
+    accent-color: var(--color-scheme-accent-color);
+    background-color: var(--color-scheme-background-color);
+    color: var(--color-scheme-foreground-color);
+    color-scheme: var(--color-scheme-color-scheme);
+}

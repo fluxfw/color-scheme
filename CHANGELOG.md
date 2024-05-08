@@ -6,6 +6,14 @@ Changes:
 
 \-
 
+## v2024-05-08-1
+
+Changes:
+
+- Deflux
+- Rename `accent-color-foreground-color` to `accent-foreground-color`
+- Split `color-scheme` variables to `color-schemes` and `render-color-scheme`, use `color-scheme` for self
+
 ## v2024-05-03-2
 
 Changes:

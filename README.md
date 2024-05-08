@@ -1,3 +1,1 @@
-# flux-color-scheme
-
-Color scheme
+# color-scheme

@@ -1,0 +1,9 @@
+:root, :host {
+    --select-color-scheme-background-color: #ffffff;
+    --select-color-scheme-color-scheme-accent-color: #000000;
+    --select-color-scheme-color-scheme-background-color: #ffffff;
+    --select-color-scheme-color-scheme-border-color-rgb: 128, 128, 128;
+    --select-color-scheme-color-scheme-foreground-color: #000000;
+    --select-color-scheme-color-scheme-outline-color: #000000;
+    --select-color-scheme-foreground-color: #000000;
+}

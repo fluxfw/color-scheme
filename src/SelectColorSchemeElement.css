@@ -1,6 +1,6 @@
 :host {
-    background-color: var(--flux-select-color-scheme-background-color);
-    color: var(--flux-select-color-scheme-foreground-color);
+    background-color: var(--select-color-scheme-background-color);
+    color: var(--select-color-scheme-foreground-color);
     display: block;
     height: auto;
     max-width: 100%;
@@ -30,8 +30,8 @@
 
 .color_scheme {
     background-clip: content-box;
-    background-color: var(--flux-select-color-scheme-color-scheme-background-color);
-    border: 1px solid rgb(var(--flux-select-color-scheme-color-scheme-border-color-rgb), 0.5);
+    background-color: var(--select-color-scheme-color-scheme-background-color);
+    border: 1px solid rgb(var(--select-color-scheme-color-scheme-border-color-rgb), 0.5);
     border-radius: 45px;
     cursor: default;
     flex-grow: 0;
@@ -49,12 +49,12 @@
 }
 
 .color_scheme:focus-visible {
-    outline: 2px solid var(--flux-select-color-scheme-color-scheme-outline-color);
+    outline: 2px solid var(--select-color-scheme-color-scheme-outline-color);
     outline-offset: -2px;
 }
 
 .color_scheme::before {
-    background-color: var(--flux-select-color-scheme-color-scheme-foreground-color);
+    background-color: var(--select-color-scheme-color-scheme-foreground-color);
     content: "";
     position: absolute;
 }
@@ -79,7 +79,7 @@
 }
 
 [data-show_accent_color] .color_scheme:not([data-system])::after {
-    background-color: var(--flux-select-color-scheme-color-scheme-accent-color);
+    background-color: var(--select-color-scheme-color-scheme-accent-color);
     content: "";
     left: 50%;
     position: absolute;
@@ -97,7 +97,7 @@
 }
 
 .color_scheme[data-selected] {
-    border-color: rgb(var(--flux-select-color-scheme-color-scheme-border-color-rgb));
+    border-color: rgb(var(--select-color-scheme-color-scheme-border-color-rgb));
     border-width: 4px;
     padding: 0;
 }

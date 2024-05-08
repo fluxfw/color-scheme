@@ -1,6 +1,6 @@
 import { LOCALIZATION_KEY_DARK, LOCALIZATION_KEY_LIGHT, LOCALIZATION_KEY_SYSTEM_BASED } from "./LOCALIZATION_KEY.mjs";
 
-export const TEXTS_DE = Object.freeze({
+export const TEXTS_DE_CH = Object.freeze({
     [LOCALIZATION_KEY_DARK]: "Dunkel",
     [LOCALIZATION_KEY_LIGHT]: "Hell",
     [LOCALIZATION_KEY_SYSTEM_BASED]: "Systembasiert"
