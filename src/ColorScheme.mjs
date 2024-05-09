@@ -97,7 +97,8 @@ export class ColorScheme extends EventTarget {
                     [`${COLOR_SCHEME_VARIABLE_PREFIX}background-color`]: "background-color",
                     [`${COLOR_SCHEME_VARIABLE_PREFIX}color-scheme`]: "color-scheme",
                     [`${COLOR_SCHEME_VARIABLE_PREFIX}foreground-color`]: "foreground-color"
-                }
+                },
+                true
             );
 
             await style_sheet_manager.addShadowStyleSheet(

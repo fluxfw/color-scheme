@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-05-09-1
+
+Changes:
+
+- Fix generated `color-scheme` position
+
 ## v2024-05-08-2
 
 Changes:
