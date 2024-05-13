@@ -1,5 +1,5 @@
 /** @typedef {import("./Localization/Localization.mjs").Localization} Localization */
 
 /**
- * @typedef {{"default-color-scheme": string, detector: MediaQueryList, label: (localization: Localization) => Promise<string>, name: string, "use-in-color-scheme": boolean}} SystemColorScheme
+ * @typedef {{default?: string | null, detector: MediaQueryList, label?: string | {[key: string]: string} | ((localization: Localization) => Promise<string | null>) | null, name: string}} SystemColorScheme
  */

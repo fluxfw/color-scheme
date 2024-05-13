@@ -1,5 +1,5 @@
 /** @typedef {import("./Localization/Localization.mjs").Localization} Localization */
 
 /**
- * @typedef {{label: (localization: Localization) => Promise<string>, name: string}} ColorSchemeObject
+ * @typedef {{default?: boolean | null, label?: string | {[key: string]: string} | ((localization?: Localization | null, system_label?: string | null) => Promise<string | null>) | null, name: string}} ColorSchemeObject
  */

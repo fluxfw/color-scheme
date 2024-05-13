@@ -6,6 +6,24 @@ Changes:
 
 \-
 
+## v2024-05-13-1
+
+Changes:
+
+- Replace static passed color schemes/variables with adder
+- Add missed functionality for own select ui (Getter and setter)
+- Multiple default color schemes can be set
+  - If system, this is used as default selected color scheme and an other non-system is used as fallback
+  - If non-system only, this is used for both as default selected color scheme and as fallback
+  - Remove default set to system
+- Label can be static (String or object)
+- Only render after add color scheme (Need to add system color scheme as last)
+- Improved get color scheme
+- Sort color schemes by label
+- Optional Localization/SettingsStorage
+- Remove default color schemes
+- Remove select ui
+
 ## v2024-05-09-1
 
 Changes:
