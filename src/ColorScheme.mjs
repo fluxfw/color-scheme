@@ -526,7 +526,7 @@ export class ColorScheme extends EventTarget {
 
         if (this.#style_sheet_rule === null) {
             const style_sheet = new CSSStyleSheet();
-            this.#style_sheet_rule = style_sheet.cssRules[style_sheet.insertRule(":root, :host { }")];
+            this.#style_sheet_rule = style_sheet.cssRules[style_sheet.insertRule(":root, :host {}")];
             this.#root.adoptedStyleSheets.push(style_sheet);
         }
 

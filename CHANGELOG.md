@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-05-20-1
+
+Changes:
+
+- `insertRule`/`matchMedia`
+
 ## v2024-05-13-1
 
 Changes:

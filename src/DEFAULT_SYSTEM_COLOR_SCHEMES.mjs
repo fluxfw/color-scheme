@@ -9,7 +9,7 @@ import { LOCALIZATION_KEY_DARK, LOCALIZATION_KEY_LIGHT } from "./Localization/LO
  */
 export const DEFAULT_SYSTEM_COLOR_SCHEMES = Object.freeze([
     Object.freeze({
-        detector: matchMedia(`(prefers-color-scheme:${COLOR_SCHEME_DARK})`),
+        detector: matchMedia(`(prefers-color-scheme: ${COLOR_SCHEME_DARK})`),
         label: async localization => localization.translate(
             LOCALIZATION_MODULE,
             LOCALIZATION_KEY_DARK
@@ -17,7 +17,7 @@ export const DEFAULT_SYSTEM_COLOR_SCHEMES = Object.freeze([
         name: COLOR_SCHEME_DARK
     }),
     Object.freeze({
-        detector: matchMedia(`(prefers-color-scheme:${COLOR_SCHEME_LIGHT})`),
+        detector: matchMedia(`(prefers-color-scheme: ${COLOR_SCHEME_LIGHT})`),
         label: async localization => localization.translate(
             LOCALIZATION_MODULE,
             LOCALIZATION_KEY_LIGHT
