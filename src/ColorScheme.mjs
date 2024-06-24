@@ -15,6 +15,8 @@ import { SETTINGS_STORAGE_KEY_COLOR_SCHEME, SETTINGS_STORAGE_KEY_COLOR_SCHEME_SY
 
 export const COLOR_SCHEME_EVENT_CHANGE = "color-scheme-change";
 
+export const COLOR_SCHEME_EVENT_RENDER = "color-scheme-render";
+
 export const COLOR_SCHEME_VARIABLE_PREFIX = "--color-scheme-";
 
 export class ColorScheme extends EventTarget {
@@ -580,6 +582,19 @@ export class ColorScheme extends EventTarget {
             RENDER_COLOR_SCHEME_VARIABLE_PREFIX
         ].some(prefix => _key.startsWith(prefix)))) {
             style_sheet_rule.style.removeProperty(key);
+        }
+
+        const render_promises = [];
+        this.dispatchEvent(new CustomEvent(COLOR_SCHEME_EVENT_RENDER, {
+            detail: {
+                color_scheme,
+                wait: promise => {
+                    render_promises.push(promise);
+                }
+            }
+        }));
+        if (render_promises.length > 0) {
+            await Promise.all(render_promises);
         }
 
         for (const variable of this.#variables) {

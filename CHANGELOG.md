@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-06-24-1
+
+Changes:
+
+- Render event for async load color scheme variables
+
 ## v2024-05-20-1
 
 Changes:
