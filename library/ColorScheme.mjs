@@ -4,10 +4,10 @@ import shadow_css from "./ColorSchemeShadow.css" with { type: "css" };
 import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_RGB, COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_COLOR_SCHEME, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_RGB_SUFFIX, COLOR_SCHEMES_VARIABLE_PREFIX, DEFAULT_COLOR_SCHEME_VARIABLES, RENDER_COLOR_SCHEME_VARIABLE_PREFIX } from "./COLOR_SCHEME_VARIABLE.mjs";
 import { SETTINGS_STORAGE_KEY_COLOR_SCHEME, SETTINGS_STORAGE_KEY_COLOR_SCHEME_SYSTEM } from "./SettingsStorage/SETTINGS_STORAGE_KEY.mjs";
 
-/** @typedef {import("button-group/src/ButtonGroupElement.mjs").ButtonGroupElement} ButtonGroupElement */
+/** @typedef {import("button-group/ButtonGroupElement.mjs").ButtonGroupElement} ButtonGroupElement */
 /** @typedef {import("./ColorSchemeObject.mjs").ColorSchemeObject} ColorSchemeObject */
 /** @typedef {import("./ColorSchemeValue.mjs").ColorSchemeValue} ColorSchemeValue */
-/** @typedef {import("form/src/InputElement.mjs").InputElement} InputElement */
+/** @typedef {import("form/InputElement.mjs").InputElement} InputElement */
 /** @typedef {import("./Localization/Localization.mjs").Localization} Localization */
 /** @typedef {import("./SettingsStorage/SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
