@@ -9,15 +9,15 @@ export const COLOR_SCHEME_SYSTEM = "system";
  * @type {ColorSchemeObject}
  */
 export const SYSTEM_COLOR_SCHEME = Object.freeze({
-    label: async (localization = null, system_label = null) => system_label !== null ? localization?.translate(
+    label: async (localization = null, system_label = null) => (system_label !== null ? localization?.translate(
         LOCALIZATION_MODULE,
         LOCALIZATION_KEY_SYSTEM_WITH_COLOR_SCHEME,
         {
             "color-scheme": system_label
         }
-    ) ?? null : localization?.translate(
+    ) : localization?.translate(
         LOCALIZATION_MODULE,
         LOCALIZATION_KEY_SYSTEM
-    ) ?? null,
+    )) ?? null,
     name: COLOR_SCHEME_SYSTEM
 });

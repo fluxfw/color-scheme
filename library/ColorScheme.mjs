@@ -506,12 +506,12 @@ export class ColorScheme extends EventTarget {
      * @returns {Promise<string>}
      */
     async #getLabel(color_scheme, system_label = null) {
-        return ((color_scheme.label ?? null) !== null ? typeof color_scheme.label === "function" ? await color_scheme.label(
+        return (typeof color_scheme.label === "function" ? await color_scheme.label(
             this.#localization,
             system_label
         ) : typeof color_scheme.label === "object" ? this.#localization?.translateStatic(
             color_scheme.label
-        ) ?? null : color_scheme.label : null) ?? color_scheme.name;
+        ) : color_scheme.label) ?? color_scheme.name;
     }
 
     /**
