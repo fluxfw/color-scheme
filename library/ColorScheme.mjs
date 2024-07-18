@@ -27,7 +27,7 @@ export class ColorScheme extends EventTarget {
     /**
      * @type {ColorSchemeObject[]}
      */
-    #color_schemes;
+    #color_schemes = [];
     /**
      * @type {Localization | null}
      */
@@ -47,7 +47,7 @@ export class ColorScheme extends EventTarget {
     /**
      * @type {SystemColorScheme[]}
      */
-    #system_color_schemes;
+    #system_color_schemes = [];
     /**
      * @type {AbortController | null}
      */
@@ -127,11 +127,9 @@ export class ColorScheme extends EventTarget {
         super();
 
         this.#root = root;
+        this.#variables = variables;
         this.#localization = localization;
         this.#settings_storage = settings_storage;
-        this.#color_schemes = [];
-        this.#system_color_schemes = [];
-        this.#variables = variables;
     }
 
     /**
