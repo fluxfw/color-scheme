@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-08-05-3
+
+Changes:
+
+- Update theme color with change event
+
 ## v2024-08-05-2
 
 Changes:
