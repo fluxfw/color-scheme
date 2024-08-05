@@ -2,20 +2,13 @@ import { COLOR_SCHEME_SYSTEM } from "./SYSTEM_COLOR_SCHEME.mjs";
 import root_css from "./ColorSchemeRoot.css" with { type: "css" };
 import shadow_css from "./ColorSchemeShadow.css" with { type: "css" };
 import { COLOR_SCHEME_VARIABLE_ACCENT_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_COLOR_RGB, COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_ACCENT_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR, COLOR_SCHEME_VARIABLE_BACKGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_COLOR_SCHEME, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR, COLOR_SCHEME_VARIABLE_FOREGROUND_COLOR_RGB, COLOR_SCHEME_VARIABLE_RGB_SUFFIX, COLOR_SCHEMES_VARIABLE_PREFIX, DEFAULT_COLOR_SCHEME_VARIABLES, RENDER_COLOR_SCHEME_VARIABLE_PREFIX } from "./COLOR_SCHEME_VARIABLE.mjs";
-import { SETTINGS_STORAGE_KEY_COLOR_SCHEME, SETTINGS_STORAGE_KEY_COLOR_SCHEME_SYSTEM } from "./SettingsStorage/SETTINGS_STORAGE_KEY.mjs";
 
-/** @typedef {import("button-group/ButtonGroupElement.mjs").ButtonGroupElement} ButtonGroupElement */
 /** @typedef {import("./ColorSchemeObject.mjs").ColorSchemeObject} ColorSchemeObject */
 /** @typedef {import("./ColorSchemeValue.mjs").ColorSchemeValue} ColorSchemeValue */
-/** @typedef {import("form/InputElement.mjs").InputElement} InputElement */
+/** @typedef {import("./ColorSchemeWithEvents.mjs").ColorSchemeWithEvents} ColorSchemeWithEvents */
 /** @typedef {import("./Localization/Localization.mjs").Localization} Localization */
-/** @typedef {import("./SettingsStorage/SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./SystemColorScheme.mjs").SystemColorScheme} SystemColorScheme */
-
-export const COLOR_SCHEME_EVENT_CHANGE = "color-scheme-change";
-
-export const COLOR_SCHEME_EVENT_RENDER = "color-scheme-render";
 
 export const COLOR_SCHEME_VARIABLE_PREFIX = "--color-scheme-";
 
@@ -23,11 +16,20 @@ export class ColorScheme extends EventTarget {
     /**
      * @type {{name: string | null, system_names: {[key: string]: string}}}
      */
-    #color_scheme;
+    #color_scheme = {
+        name: null,
+        system_names: this.#deepFreeze(
+            {}
+        )
+    };
     /**
      * @type {ColorSchemeObject[]}
      */
     #color_schemes = [];
+    /**
+     * @type {string | null}
+     */
+    #last_change_detail = null;
     /**
      * @type {Localization | null}
      */
@@ -36,10 +38,6 @@ export class ColorScheme extends EventTarget {
      * @type {Document | ShadowRoot}
      */
     #root;
-    /**
-     * @type {SettingsStorage | null}
-     */
-    #settings_storage;
     /**
      * @type {CSSStyleRule | null}
      */
@@ -60,11 +58,10 @@ export class ColorScheme extends EventTarget {
     /**
      * @param {Document | ShadowRoot | null} root
      * @param {Localization | null} localization
-     * @param {SettingsStorage | null} settings_storage
      * @param {StyleSheetManager | null} style_sheet_manager
-     * @returns {Promise<ColorScheme>}
+     * @returns {Promise<ColorSchemeWithEvents>}
      */
-    static async new(root = null, localization = null, settings_storage = null, style_sheet_manager = null) {
+    static async new(root = null, localization = null, style_sheet_manager = null) {
         const _root = root ?? document;
 
         if (style_sheet_manager !== null) {
@@ -104,50 +101,57 @@ export class ColorScheme extends EventTarget {
             }
         }
 
-        const color_scheme = new this(
+        return new this(
             _root,
             Array.from(DEFAULT_COLOR_SCHEME_VARIABLES),
-            localization,
-            settings_storage
+            localization
         );
-
-        color_scheme.#color_scheme = await color_scheme.#getColorScheme();
-
-        return color_scheme;
     }
 
     /**
      * @param {Document | ShadowRoot} root
      * @param {string[]} variables
      * @param {Localization | null} localization
-     * @param {SettingsStorage | null} settings_storage
      * @private
      */
-    constructor(root, variables, localization, settings_storage) {
+    constructor(root, variables, localization) {
         super();
 
         this.#root = root;
         this.#variables = variables;
         this.#localization = localization;
-        this.#settings_storage = settings_storage;
     }
 
     /**
      * @param {ColorSchemeObject} color_scheme
+     * @param {boolean | null} render
+     * @param {boolean | null} change_event
      * @returns {Promise<void>}
      */
-    async addColorScheme(color_scheme) {
+    async addColorScheme(color_scheme, render = null, change_event = null) {
         if (this.#color_schemes.some(_color_scheme => _color_scheme.name === color_scheme.name)) {
             throw new Error(`Color scheme with name ${color_scheme.name} already exists!`);
         }
 
-        this.#color_schemes.push(color_scheme);
+        this.#color_schemes.push(this.#deepFreeze(
+            {
+                ...(color_scheme.default ?? null) !== null ? {
+                    default: color_scheme.default
+                } : null,
+                ...(color_scheme.label ?? null) !== null ? {
+                    label: typeof color_scheme.label === "function" ? color_scheme.label : structuredClone(color_scheme.label)
+                } : null,
+                name: color_scheme.name
+            }
+        ));
 
-        if (!(this.#color_scheme.name !== null ? this.#color_scheme.name === color_scheme.name : color_scheme.default ?? false)) {
+        if (!(render === null ? this.#color_scheme.name !== null ? this.#color_scheme.name === color_scheme.name : color_scheme.default ?? false : render)) {
             return;
         }
 
-        await this.#render();
+        await this.render(
+            change_event
+        );
     }
 
     /**
@@ -159,7 +163,18 @@ export class ColorScheme extends EventTarget {
             throw new Error(`System color scheme with name ${system_color_scheme.name} already exists!`);
         }
 
-        this.#system_color_schemes.push(system_color_scheme);
+        this.#system_color_schemes.push(this.#deepFreeze(
+            {
+                ...(system_color_scheme.default ?? null) !== null ? {
+                    default: system_color_scheme.default
+                } : null,
+                detector: system_color_scheme.detector,
+                ...(system_color_scheme.label ?? null) !== null ? {
+                    label: typeof system_color_scheme.label === "function" ? system_color_scheme.label : structuredClone(system_color_scheme.label)
+                } : null,
+                name: system_color_scheme.name
+            }
+        ));
     }
 
     /**
@@ -224,18 +239,20 @@ export class ColorScheme extends EventTarget {
             }
         }
 
-        return {
-            label: await this.#getLabel(
-                color_scheme
-            ),
-            name: color_scheme.name,
-            system: system !== null ? {
+        return this.#deepFreeze(
+            {
                 label: await this.#getLabel(
-                    system
+                    color_scheme
                 ),
-                name: system.name
-            } : null
-        };
+                name: color_scheme.name,
+                system: system !== null ? {
+                    label: await this.#getLabel(
+                        system
+                    ),
+                    name: system.name
+                } : null
+            }
+        );
     }
 
     /**
@@ -262,37 +279,39 @@ export class ColorScheme extends EventTarget {
             );
         }
 
-        return Object.fromEntries(Object.entries(color_schemes).sort(([
-            name_1,
-            label_1
-        ], [
-            name_2,
-            label_2
-        ]) => {
-            const system_1 = name_1 === COLOR_SCHEME_SYSTEM ? 0 : 1;
-            const system_2 = name_2 === COLOR_SCHEME_SYSTEM ? 0 : 1;
+        return this.#deepFreeze(
+            Object.fromEntries(Object.entries(color_schemes).sort(([
+                name_1,
+                label_1
+            ], [
+                name_2,
+                label_2
+            ]) => {
+                const system_1 = name_1 === COLOR_SCHEME_SYSTEM ? 0 : 1;
+                const system_2 = name_2 === COLOR_SCHEME_SYSTEM ? 0 : 1;
 
-            if (system_1 > system_2) {
-                return 1;
-            }
+                if (system_1 > system_2) {
+                    return 1;
+                }
 
-            if (system_1 < system_2) {
-                return -1;
-            }
+                if (system_1 < system_2) {
+                    return -1;
+                }
 
-            const _label_1 = label_1.toLowerCase();
-            const _label_2 = label_2.toLowerCase();
+                const _label_1 = label_1.toLowerCase();
+                const _label_2 = label_2.toLowerCase();
 
-            if (_label_1 > _label_2) {
-                return 1;
-            }
+                if (_label_1 > _label_2) {
+                    return 1;
+                }
 
-            if (_label_1 < _label_2) {
-                return -1;
-            }
+                if (_label_1 < _label_2) {
+                    return -1;
+                }
 
-            return 0;
-        }));
+                return 0;
+            }))
+        );
     }
 
     /**
@@ -307,26 +326,28 @@ export class ColorScheme extends EventTarget {
             );
         }
 
-        return Object.fromEntries(Object.entries(system_color_schemes).sort(([
-            ,
-            label_1
-        ], [
-            ,
-            label_2
-        ]) => {
-            const _label_1 = label_1.toLowerCase();
-            const _label_2 = label_2.toLowerCase();
+        return this.#deepFreeze(
+            Object.fromEntries(Object.entries(system_color_schemes).sort(([
+                ,
+                label_1
+            ], [
+                ,
+                label_2
+            ]) => {
+                const _label_1 = label_1.toLowerCase();
+                const _label_2 = label_2.toLowerCase();
 
-            if (_label_1 > _label_2) {
-                return 1;
-            }
+                if (_label_1 > _label_2) {
+                    return 1;
+                }
 
-            if (_label_1 < _label_2) {
-                return -1;
-            }
+                if (_label_1 < _label_2) {
+                    return -1;
+                }
 
-            return 0;
-        }));
+                return 0;
+            }))
+        );
     }
 
     /**
@@ -339,7 +360,9 @@ export class ColorScheme extends EventTarget {
             system_names[system_color_scheme.name] = this.#color_scheme.system_names[system_color_scheme.name] ?? system_color_scheme.default ?? null;
         }
 
-        return system_names;
+        return this.#deepFreeze(
+            system_names
+        );
     }
 
     /**
@@ -432,47 +455,141 @@ export class ColorScheme extends EventTarget {
     }
 
     /**
-     * @param {string | null} name
+     * @param {boolean | null} change_event
      * @returns {Promise<void>}
      */
-    async setColorScheme(name = null) {
-        this.#color_scheme.name = name;
+    async render(change_event = null) {
+        const color_scheme = await this.getColorScheme();
+        const system_names = await this.getSystemColorSchemesNames();
 
-        await this.#settings_storage?.store(
-            SETTINGS_STORAGE_KEY_COLOR_SCHEME,
-            this.#color_scheme.name
+        this.#initSystemDetector(
+            color_scheme
         );
 
-        await this.#render();
+        const style_sheet_rule = this.#getStyleSheetRule();
+
+        for (const key of Array.from(style_sheet_rule.style).filter(_key => [
+            COLOR_SCHEMES_VARIABLE_PREFIX,
+            RENDER_COLOR_SCHEME_VARIABLE_PREFIX
+        ].some(prefix => _key.startsWith(prefix)))) {
+            style_sheet_rule.style.removeProperty(key);
+        }
+
+        const render_promises = [];
+        this.dispatchEvent(new CustomEvent("render", {
+            detail: this.#deepFreeze(
+                {
+                    color_scheme,
+                    system_names,
+                    wait: promise => {
+                        render_promises.push(promise);
+                    }
+                }
+            )
+        }));
+        if (render_promises.length > 0) {
+            await Promise.all(render_promises);
+        }
+
+        for (const variable of this.#variables) {
+            if (variable.endsWith(COLOR_SCHEME_VARIABLE_RGB_SUFFIX)) {
+                const _variable = variable.slice(0, -COLOR_SCHEME_VARIABLE_RGB_SUFFIX.length);
+
+                if (!this.#variables.includes(_variable)) {
+                    for (const _color_scheme of this.#color_schemes.filter(__color_scheme => __color_scheme.name !== COLOR_SCHEME_SYSTEM)) {
+                        style_sheet_rule.style.setProperty(`${COLOR_SCHEMES_VARIABLE_PREFIX}${_color_scheme.name}-${_variable}`, `rgb(var(${COLOR_SCHEMES_VARIABLE_PREFIX}${_color_scheme.name}-${variable}))`);
+                    }
+
+                    style_sheet_rule.style.setProperty(`${RENDER_COLOR_SCHEME_VARIABLE_PREFIX}${_variable}`, `var(${COLOR_SCHEMES_VARIABLE_PREFIX}${color_scheme.name}-${_variable})`);
+                }
+            }
+
+            style_sheet_rule.style.setProperty(`${RENDER_COLOR_SCHEME_VARIABLE_PREFIX}${variable}`, `var(${COLOR_SCHEMES_VARIABLE_PREFIX}${color_scheme.name}-${variable})`);
+        }
+
+        if (this.#root instanceof Document) {
+            const theme_color_meta_element = this.#root.head.querySelector("meta[name=theme-color]") ?? this.#root.createElement("meta");
+            theme_color_meta_element.content = await this.getVariableAccentColor();
+            if (!theme_color_meta_element.isConnected) {
+                theme_color_meta_element.name = "theme-color";
+                this.#root.head.append(theme_color_meta_element);
+            }
+        }
+
+        const change_detail = this.#deepFreeze(
+            {
+                color_scheme,
+                system_names
+            }
+        );
+        const change_detail_string = JSON.stringify(change_detail);
+        if (!(change_event === null ? this.#last_change_detail === change_detail_string : change_event)) {
+            return;
+        }
+        this.#last_change_detail = change_detail_string;
+        this.dispatchEvent(new CustomEvent("change", {
+            detail: change_detail
+        }));
+    }
+
+    /**
+     * @param {string | null} name
+     * @param {boolean | null} render
+     * @param {boolean | null} change_event
+     * @returns {Promise<void>}
+     */
+    async setColorScheme(name = null, render = null, change_event = null) {
+        this.#color_scheme.name = name;
+
+        if (!(render ?? true)) {
+            return;
+        }
+
+        await this.render(
+            change_event
+        );
     }
 
     /**
      * @param {{[key: string]: string} | null} system_names
+     * @param {boolean | null} render
+     * @param {boolean | null} change_event
      * @returns {Promise<void>}
      */
-    async setSystemColorSchemes(system_names = null) {
-        this.#color_scheme.system_names = structuredClone(system_names ?? {});
-
-        await this.#settings_storage?.store(
-            SETTINGS_STORAGE_KEY_COLOR_SCHEME_SYSTEM,
-            this.#color_scheme.system_names
+    async setSystemColorSchemes(system_names = null, render = null, change_event = null) {
+        this.#color_scheme.system_names = this.#deepFreeze(
+            structuredClone(system_names ?? {})
         );
 
-        await this.#render();
+        if (!(render ?? true)) {
+            return;
+        }
+
+        await this.render(
+            change_event
+        );
     }
 
     /**
-     * @returns {Promise<{name: string | null, system_names: {[key: string]: string}}>}
+     * @template V
+     * @param {V} value
+     * @returns {V}
      */
-    async #getColorScheme() {
-        return {
-            name: await this.#settings_storage?.get(
-                SETTINGS_STORAGE_KEY_COLOR_SCHEME
-            ) ?? null,
-            system_names: await this.#settings_storage?.get(
-                SETTINGS_STORAGE_KEY_COLOR_SCHEME_SYSTEM
-            ) ?? {}
-        };
+    #deepFreeze(value) {
+        if (value !== null && [
+            "function",
+            "object"
+        ].includes(typeof value)) {
+            Object.freeze(value);
+
+            Object.values(value).forEach(_value => {
+                this.#deepFreeze(
+                    _value
+                );
+            });
+        }
+
+        return value;
     }
 
     /**
@@ -547,7 +664,7 @@ export class ColorScheme extends EventTarget {
 
             for (const system_color_scheme of this.#system_color_schemes) {
                 system_color_scheme.detector.addEventListener("change", async () => {
-                    await this.#render();
+                    await this.render();
                 }, {
                     signal: this.#system_detector_abort_controller.signal
                 });
@@ -561,69 +678,5 @@ export class ColorScheme extends EventTarget {
 
             this.#system_detector_abort_controller = null;
         }
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async #render() {
-        const color_scheme = await this.getColorScheme();
-
-        this.#initSystemDetector(
-            color_scheme
-        );
-
-        const style_sheet_rule = this.#getStyleSheetRule();
-
-        for (const key of Array.from(style_sheet_rule.style).filter(_key => [
-            COLOR_SCHEMES_VARIABLE_PREFIX,
-            RENDER_COLOR_SCHEME_VARIABLE_PREFIX
-        ].some(prefix => _key.startsWith(prefix)))) {
-            style_sheet_rule.style.removeProperty(key);
-        }
-
-        const render_promises = [];
-        this.dispatchEvent(new CustomEvent(COLOR_SCHEME_EVENT_RENDER, {
-            detail: {
-                color_scheme,
-                wait: promise => {
-                    render_promises.push(promise);
-                }
-            }
-        }));
-        if (render_promises.length > 0) {
-            await Promise.all(render_promises);
-        }
-
-        for (const variable of this.#variables) {
-            if (variable.endsWith(COLOR_SCHEME_VARIABLE_RGB_SUFFIX)) {
-                const _variable = variable.slice(0, -COLOR_SCHEME_VARIABLE_RGB_SUFFIX.length);
-
-                if (!this.#variables.includes(_variable)) {
-                    for (const _color_scheme of this.#color_schemes.filter(__color_scheme => __color_scheme.name !== COLOR_SCHEME_SYSTEM)) {
-                        style_sheet_rule.style.setProperty(`${COLOR_SCHEMES_VARIABLE_PREFIX}${_color_scheme.name}-${_variable}`, `rgb(var(${COLOR_SCHEMES_VARIABLE_PREFIX}${_color_scheme.name}-${variable}))`);
-                    }
-
-                    style_sheet_rule.style.setProperty(`${RENDER_COLOR_SCHEME_VARIABLE_PREFIX}${_variable}`, `var(${COLOR_SCHEMES_VARIABLE_PREFIX}${color_scheme.name}-${_variable})`);
-                }
-            }
-
-            style_sheet_rule.style.setProperty(`${RENDER_COLOR_SCHEME_VARIABLE_PREFIX}${variable}`, `var(${COLOR_SCHEMES_VARIABLE_PREFIX}${color_scheme.name}-${variable})`);
-        }
-
-        if (this.#root instanceof Document) {
-            const theme_color_meta_element = this.#root.head.querySelector("meta[name=theme-color]") ?? this.#root.createElement("meta");
-            theme_color_meta_element.content = await this.getVariableAccentColor();
-            if (!theme_color_meta_element.isConnected) {
-                theme_color_meta_element.name = "theme-color";
-                this.#root.head.append(theme_color_meta_element);
-            }
-        }
-
-        this.dispatchEvent(new CustomEvent(COLOR_SCHEME_EVENT_CHANGE, {
-            detail: {
-                color_scheme
-            }
-        }));
     }
 }

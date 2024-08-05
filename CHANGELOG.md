@@ -6,6 +6,15 @@ Changes:
 
 \-
 
+## v2024-08-05-1
+
+Changes:
+
+- Rename `change`|`render` events, remove constants, only if changed (`change`), bypassable or forceable on `addColorScheme`|`render`|`setColorScheme`|`setSystemColorSchemes`, add `addEventListener`|`removeEventListener` JSDoc
+- `render` public, bypassable or forceable on `addColorScheme`|`setColorScheme`|`setSystemColorSchemes`
+- Remove settings storage
+- Clone and inmutable objects
+
 ## v2024-07-26-1
 
 Changes:
