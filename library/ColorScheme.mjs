@@ -523,7 +523,7 @@ export class ColorScheme extends EventTarget {
             }
         );
         const change_detail_string = JSON.stringify(change_detail);
-        if (!(change_event === null ? this.#last_change_detail === change_detail_string : change_event)) {
+        if (!(change_event === null ? this.#last_change_detail !== change_detail_string : change_event)) {
             return;
         }
         this.#last_change_detail = change_detail_string;
