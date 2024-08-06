@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-08-06-1
+
+Changes:
+
+- Remove theme color
+
 ## v2024-08-05-3
 
 Changes:

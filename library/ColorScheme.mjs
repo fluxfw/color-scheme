@@ -101,20 +101,11 @@ export class ColorScheme extends EventTarget {
             }
         }
 
-        /**
-         * @type {ColorSchemeWithEvents}
-         */
-        const color_scheme = new this(
+        return new this(
             _root,
             Array.from(DEFAULT_COLOR_SCHEME_VARIABLES),
             localization
         );
-
-        color_scheme.addEventListener("change", async () => {
-            await color_scheme.#updateThemeColor();
-        });
-
-        return color_scheme;
     }
 
     /**
@@ -678,30 +669,5 @@ export class ColorScheme extends EventTarget {
 
             this.#system_detector_abort_controller = null;
         }
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async #updateThemeColor() {
-        if (!(this.#root instanceof Document)) {
-            return;
-        }
-
-        const theme_color_meta_element = this.#root.head.querySelector("meta[name=theme-color]") ?? this.#root.createElement("meta");
-
-        const theme_color = await this.getVariableAccentColor();
-        if (theme_color_meta_element.content === theme_color) {
-            return;
-        }
-        theme_color_meta_element.content = theme_color;
-
-        if (theme_color_meta_element.isConnected) {
-            return;
-        }
-
-        theme_color_meta_element.name = "theme-color";
-
-        this.#root.head.append(theme_color_meta_element);
     }
 }
